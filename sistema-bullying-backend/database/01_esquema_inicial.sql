@@ -4,6 +4,14 @@ USE [SistemaBullying];
 GO
 SET NOCOUNT ON;
 SET XACT_ABORT ON;
+-- Opciones requeridas por el índice del código calculado del caso.
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+SET ANSI_PADDING ON;
+SET ANSI_WARNINGS ON;
+SET CONCAT_NULL_YIELDS_NULL ON;
+SET ARITHABORT ON;
+SET NUMERIC_ROUNDABORT OFF;
 
 IF DB_NAME() <> N'SistemaBullying'
     THROW 51000, N'Conéctate a SistemaBullying antes de ejecutar el esquema.', 1;

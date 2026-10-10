@@ -99,7 +99,9 @@ significa que las funciones de seguimiento, alertas o reportes estén terminadas
 ## Estado de entrega
 
 - Actividad 8: modelo y scripts preparados.
-- Actividad 9: pendiente de ejecutar y verificar en SQL Server.
+- Actividad 9: base `SistemaBullying` creada y verificada en SQL Server local el
+  10 de octubre de 2026. Ocho tablas, once claves foráneas y catálogos iniciales.
+  Las pruebas de integridad están en `02_verificar_base.sql` y no dejan datos ficticios.
 - Actividades 10 y 11: pendientes de desarrollar usuarios/login y registro/consulta de casos.
 
 Los scripts solo contienen catálogos. No se incorporan los nombres de ejemplo del

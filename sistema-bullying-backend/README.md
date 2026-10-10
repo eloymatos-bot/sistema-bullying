@@ -13,12 +13,12 @@ sistema-bullying-backend/
   database/
     00_crear_base.sql
     01_esquema_inicial.sql
+    02_verificar_base.sql
     DISENO.md
 ```
 
-- SQL Server local: instancia detectada en el registro de Windows `ELOYSERVER`.
-- Servidor esperado en SSMS: `.\ELOYSERVER` (conectividad todavía por verificar).
-- Nombre propuesto de la base: `SistemaBullying`.
+- Motor: SQL Server local.
+- Base creada y verificada: SistemaBullying.
 - Los archivos físicos se almacenarán en las rutas predeterminadas de SQL Server,
   no en Angular, en el backend ni en GitHub.
 - Scripts y diseño: [database/DISENO.md](database/DISENO.md).
@@ -36,12 +36,14 @@ Se fija Java 17 como versión de compilación; el equipo dispone de un JDK 25.
 mvn package
 ```
 
-## Crear la base cuando corresponda la actividad 9
+## Crear la base en otra instalación
 
-1. Conectarse desde SSMS a `.\ELOYSERVER` con una cuenta autorizada.
+1. Conectarse desde SSMS a la instancia local de SQL Server con una cuenta autorizada.
 2. Revisar y ejecutar `database/00_crear_base.sql`.
 3. Revisar y ejecutar `database/01_esquema_inicial.sql` completo.
 4. Actualizar el explorador y verificar las 8 tablas y los catálogos.
+5. Ejecutar `database/02_verificar_base.sql` para probar las restricciones con
+   datos ficticios que se revierten. Los contadores IDENTITY pueden dejar saltos.
 
 El segundo script se ejecuta en una transacción y se detiene si ya existen tablas
 del proyecto. No se debe usar para actualizar un esquema con datos; los cambios
@@ -61,8 +63,18 @@ guardar hashes de contraseñas generados por Spring Security, nunca texto plano.
 
 - `mvn -o -B package`: compilación y empaquetado correctos con JDK 25.
 - Ambos scripts pasaron el análisis de sintaxis T-SQL con Microsoft ScriptDom.
-- No se han ejecutado los scripts en SQL Server. La conectividad, creación de
-  tablas y pruebas de integridad con datos corresponden a la actividad 9.
+- Actividad 9 completada el 10 de octubre de 2026: scripts ejecutados en
+  la instancia local con autenticación de Windows.
+- Verificadas 8 tablas, 11 claves foráneas, 3 roles, 4 estados y 6 tipos de incidente.
+- Pasaron 9 pruebas de rechazo de datos inválidos y el flujo de registro,
+  relaciones e historial. Los datos ficticios se revirtieron: usuarios,
+  estudiantes, casos y seguimientos quedaron vacíos.
+- El script fija las opciones SET requeridas para el índice del código calculado.
+- La conexión se verificó mediante memoria compartida local y autenticación de Windows.
+- Las rutas físicas se pueden consultar con la consulta mostrada arriba; dependen
+  de cada instalación y no se publican en el repositorio.
+
+La conexión JDBC de Spring Boot y la API todavía están pendientes.
 
 ## Referencias técnicas
 
