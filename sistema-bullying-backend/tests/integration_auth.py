@@ -27,7 +27,10 @@ SERVER = os.environ["TEST_SQL_SERVER"]
 def sql(query):
     result = subprocess.run([SQLCMD, "-S", SERVER, "-E", "-C", "-l", "5", "-b",
                              "-d", "SistemaBullying", "-h", "-1", "-W", "-Q",
-                             "SET NOCOUNT ON; " + query], capture_output=True, text=True, errors="replace")
+                             "SET NOCOUNT ON; SET ANSI_NULLS ON; SET QUOTED_IDENTIFIER ON; "
+                             "SET ANSI_PADDING ON; SET ANSI_WARNINGS ON; SET CONCAT_NULL_YIELDS_NULL ON; "
+                             "SET ARITHABORT ON; SET NUMERIC_ROUNDABORT OFF; " + query],
+                            capture_output=True, text=True, errors="replace")
     if result.returncode:
         raise RuntimeError("Falló la consulta SQL de prueba: " + result.stderr[:500])
     return result.stdout.strip()

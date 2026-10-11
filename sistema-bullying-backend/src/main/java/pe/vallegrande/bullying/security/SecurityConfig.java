@@ -44,6 +44,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(a -> a
             .requestMatchers("/api/auth/csrf", "/api/auth/login").permitAll()
             .requestMatchers("/api/users", "/api/users/**").hasRole("ADMINISTRADOR")
+            .requestMatchers("/api/cases", "/api/cases/**", "/api/students")
+                .hasAnyRole("ADMINISTRADOR", "CONVIVENCIA", "DOCENTE_TUTOR")
             .requestMatchers("/api/auth/me").authenticated()
             .anyRequest().denyAll());
         http.requestCache(c -> c.disable());

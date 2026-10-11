@@ -17,4 +17,6 @@ public class ApiErrors {
     ResponseEntity<?> duplicate() { return ResponseEntity.status(409).body(Map.of("error", "El correo ya está registrado.")); }
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<?> invalidJson() { return ResponseEntity.badRequest().body(Map.of("error", "El cuerpo de la solicitud no es válido.")); }
+    @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
+    ResponseEntity<?> method() { return ResponseEntity.status(405).body(Map.of("error", "Operación no disponible.")); }
 }

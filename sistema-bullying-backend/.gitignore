@@ -11,3 +11,5 @@ application-local.yml
 *.ldf
 *.bak
 /.local/
+__pycache__/
+*.pyc

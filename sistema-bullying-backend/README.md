@@ -8,7 +8,7 @@ conectará en las actividades de integración del cronograma.
 - Actividad 8: diseño de ocho tablas y scripts en `database/`.
 - Actividad 9: base `SistemaBullying` creada y probada.
 - Actividad 10: usuarios e inicio/cierre de sesión implementados y probados contra SQL Server.
-- Registro y consulta de casos (actividad 11): pendiente.
+- Actividad 11: registro y consulta de casos, estudiantes, filtros y acceso por rol.
 
 ## Preparación y arranque
 
@@ -17,8 +17,9 @@ mvn package
 ```
 
 La configuración de este equipo ya está en `.local/application-local.properties`,
-excluida de Git. La cuenta SQL del backend solo tiene SELECT/INSERT/UPDATE sobre
-`usuarios` y SELECT sobre `roles`; no puede crear/borrar tablas ni eliminar registros.
+excluida de Git. Los permisos de la cuenta SQL del backend están en
+`database/03_permisos_aplicacion.sql`: usuarios, consulta de catálogos y registro/consulta
+de casos y estudiantes. No puede crear/borrar tablas ni eliminar registros.
 SQL Server escucha para este proyecto solo en la interfaz local.
 
 En otro equipo, crea el archivo anterior con tus propios valores:
@@ -94,15 +95,60 @@ iniciar sesión y consultar su perfil, pero no administrar otros usuarios.
   usar proxy Angular para `/api` y el mismo hostname; no mezclar localhost y
   127.0.0.1 para las cookies SameSite.
 
-Pendientes: recuperación de contraseña, edición de roles, registro/consulta de
-casos e integración de pantallas. Las rutas de casos aún no están habilitadas.
+Pendientes: recuperación de contraseña, edición de roles e integración de pantallas.
+
+## API de la actividad 11
+
+Todas estas rutas requieren sesión. El alta también requiere CSRF.
+
+| Método y ruta | Función |
+|---|---|
+| `POST /api/cases` | Registra caso y participaciones en una transacción; devuelve 201 y Location. |
+| `GET /api/cases/{id}` | Detalle y estudiantes involucrados. |
+| `GET /api/cases` | Lista con `q`, `estado`, `tipo`, `desde`, `hasta`, `offset` y `limit`. |
+| `GET /api/cases/catalogs` | Tipos, estados y participaciones permitidas. |
+| `GET /api/cases/responsibles` | Personal activo: ID, nombres y rol; admite `q`, `offset`, `limit`. |
+| `GET /api/students` | Estudiantes disponibles; admite `q`, `offset`, `limit`. |
+
+La política inicial permite a administración y convivencia consultar todos los casos.
+Los docentes solo consultan los que registraron o tienen asignados. Un detalle ajeno
+responde 404. La búsqueda de estudiantes aplica el mismo ámbito; permite registrar
+estudiantes nuevos dentro del alta del caso. Los nombres no son identificadores únicos:
+reutilizar `estudianteId` cuando corresponda para evitar duplicados.
+
+Ejemplo ficticio de alta (sustituir responsableId por un ID activo):
+
+```json
+{
+  "fechaIncidente": "2026-10-09",
+  "lugar": "Patio",
+  "tipoCodigo": "AGRESION_VERBAL",
+  "descripcion": "Descripción del incidente reportado.",
+  "observaciones": null,
+  "responsableId": 1,
+  "estudiantes": [{
+    "nuevoEstudiante": {"nombres": "Ejemplo", "apellidos": "Ficticio", "grado": 2, "seccion": "A"},
+    "participacion": "AFECTADO"
+  }]
+}
+```
+
+Para uno existente usar `{"estudianteId":123,"participacion":"AFECTADO"}`.
+Cada participación indica un ID existente o un estudiante nuevo, nunca ambos.
+Se exige al menos un afectado, fecha no futura, responsable activo y 1–50 participaciones.
+El autor se toma de la sesión; el estado inicial siempre es REPORTADO.
+La respuesta de detalle incluye `caso`, `descripcion`, `observaciones` y `estudiantes`.
+Los listados de casos y estudiantes incluyen `items`, `total`, `offset`, `limit` (máximo 100).
+La búsqueda de casos usa código, lugar o nombre del estudiante; los filtros se combinan.
+No se implementan aún cambios de estado, seguimientos ni borrado de casos.
 
 ## Base de datos
 
 1. `database/00_crear_base.sql`: crea la base si no existe.
 2. `database/01_esquema_inicial.sql`: ocho tablas, once claves foráneas y catálogos.
 3. `database/02_verificar_base.sql`: prueba restricciones y revierte datos ficticios.
-4. `database/DISENO.md`: campos, relaciones y reglas.
+4. `database/03_permisos_aplicacion.sql`: permisos mínimos para el usuario SQL `bullying_app`, previamente creado por el administrador.
+5. `database/DISENO.md`: campos, relaciones y reglas.
 
 Ejecutar manualmente con una cuenta autorizada. Spring Boot no crea ni altera
 el esquema. El script inicial se detiene si ya hay tablas; usar migraciones después.
@@ -111,19 +157,23 @@ el esquema. El script inicial se detiene si ya hay tablas; usar migraciones desp
 
 - Compilación y empaquetado Maven con JDK 25 y objetivo Java 17.
 - Scripts ejecutados en SQL Server real, con opciones SET para el índice calculado.
-- Pruebas HTTP: `tests/integration_auth.py` (Python estándar). Requieren API local
+- Pruebas HTTP: `tests/integration_auth.py` y `tests/integration_cases.py` (Python estándar). Requieren API local
   en ejecución, base de desarrollo sin administradores, `JAVA_HOME`,
   `TEST_SQL_SERVER` y `sqlcmd` (o `SQLCMD_PATH`).
 - Verifican login, sesión, CSRF, roles, altas, duplicados, contraseñas,
   desactivación/reactivación, logout y límite de intentos.
-- Crean cuentas ficticias con prefijo aleatorio y las eliminan al terminar;
-  no borran usuarios ajenos a la prueba. Dejan saltos normales en IDENTITY.
+- La suite de casos verifica persistencia, asignación, permisos por docente, filtros,
+  paginación, búsquedas literales, validaciones y ausencia de datos parciales al rechazar altas.
+- Crean cuentas, casos y estudiantes ficticios con prefijo aleatorio y los eliminan al terminar;
+  no borran datos ajenos a la prueba. Dejan saltos normales en IDENTITY.
 - La cuenta usada para las pruebas SQL necesita permiso de eliminar sus datos
   ficticios; la cuenta SQL del backend no tiene ese permiso.
 
 ```powershell
 $env:TEST_SQL_SERVER='lpc:.\TU_INSTANCIA'
 python tests/integration_auth.py
+# Esperar un minuto o reiniciar el backend antes de ejecutar la siguiente suite.
+python tests/integration_cases.py
 ```
 
 El límite de login permanece un minuto tras la prueba; espera o reinicia el backend
