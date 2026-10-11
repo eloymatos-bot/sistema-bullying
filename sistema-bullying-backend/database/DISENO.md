@@ -54,7 +54,9 @@ El SQL contiene el detalle exacto de tipos, longitudes, valores nulos y restricc
 
 ## Reglas que implementará Spring Boot
 
-Estas reglas están diseñadas, pero **todavía no están implementadas en una API**:
+La actividad 10 implementa normalización del correo, hashes de contraseñas,
+permisos para administrar usuarios y comprobación de cuenta activa.
+Las reglas de casos y seguimiento de esta lista siguen pendientes:
 
 - Normalizar y validar el correo; generar y verificar hashes de contraseña mediante
   Spring Security. La restricción de longitud de SQL no demuestra que un hash sea válido.
@@ -102,7 +104,8 @@ significa que las funciones de seguimiento, alertas o reportes estén terminadas
 - Actividad 9: base `SistemaBullying` creada y verificada en SQL Server local el
   10 de octubre de 2026. Ocho tablas, once claves foráneas y catálogos iniciales.
   Las pruebas de integridad están en `02_verificar_base.sql` y no dejan datos ficticios.
-- Actividades 10 y 11: pendientes de desarrollar usuarios/login y registro/consulta de casos.
+- Actividad 10: usuarios/login implementados con sesiones, roles y contraseñas BCrypt.
+- Actividad 11: registro/consulta de casos pendiente.
 
 Los scripts solo contienen catálogos. No se incorporan los nombres de ejemplo del
 frontend ni datos reales de menores a la base.

@@ -10,3 +10,4 @@ application-local.yml
 *.mdf
 *.ldf
 *.bak
+/.local/
