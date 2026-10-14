@@ -1,32 +1,20 @@
 <div class="login-page">
-  <section class="login-brand">
-    <div class="institution">◉ &nbsp; I.E. N.° 20191 “CERRO ALEGRE”</div>
-    <div class="brand-content">
-      <h1>Convivencia<br>escolar, en orden</h1>
-      <p>Registra, organiza y da seguimiento a los casos de bullying con la información siempre centralizada y al alcance del personal responsable.</p>
-      <div class="network"><i></i><i></i><i></i><i></i><b></b><span></span></div>
-    </div>
-    <small>Institución Educativa N.° 20191 Cerro Alegre<br>Sistema de gestión de convivencia escolar</small>
-  </section>
-  <section class="login-side">
-    <div class="login-box">
-      <div class="eyebrow">ACCESO AL SISTEMA</div>
-      <h2>Inicia sesión</h2>
-      <p>Ingresa con las credenciales asignadas por la institución educativa.</p>
-      <label>Ingresar como</label>
-      <div class="roles">
-        <button type="button" [class.active]="role==='Administrador'" (click)="role='Administrador'">Administrador</button>
-        <button type="button" [class.active]="role==='Convivencia escolar'" (click)="role='Convivencia escolar'">Convivencia escolar</button>
-        <button type="button" [class.active]="role==='Docente / tutor'" (click)="role='Docente / tutor'">Docente / tutor</button>
-      </div>
-      <label>Correo institucional</label>
-      <input [(ngModel)]="email" type="email" placeholder="nombre.apellido@institucion.edu.pe">
-      <label>Contraseña</label>
-      <input [(ngModel)]="password" type="password" placeholder="••••••••">
-      <div class="login-options"><label class="remember"><input type="checkbox"> Recordar mi cuenta</label><a href="#" (click)="$event.preventDefault(); notify('Comunícate con el administrador del sistema.')">¿Olvidaste tu contraseña?</a></div>
-      <button class="login-btn" (click)="login()">Ingresar</button>
-      <div class="restricted">acceso restringido</div>
-      <div class="note">Solo personal autorizado por la institución educativa puede acceder. Si no tienes una cuenta, comunícate con el administrador del sistema.</div>
-    </div>
-  </section>
+ <section class="login-brand">
+  <div class="institution"><span class="school-mark">●</span> I.E. “SAN JOSÉ” CERRO ALEGRE, IMPERIAL CAÑETE</div>
+  <div class="brand-content"><h1>Convivencia<br>escolar, en orden.</h1><p>Registra, organiza y da seguimiento a los casos de bullying con la información siempre centralizada y al alcance del personal responsable.</p>
+   <div class="network" aria-hidden="true"><img class="v0" src="assets/figma/network-0.svg" alt=""><img class="v1" src="assets/figma/network-1.svg" alt=""><img class="v2" src="assets/figma/network-2.svg" alt=""><img class="v3" src="assets/figma/network-3.svg" alt=""><img class="v4" src="assets/figma/network-4.svg" alt=""><img class="v5" src="assets/figma/network-5.svg" alt=""><img class="v6" src="assets/figma/network-6.svg" alt=""><img class="n0" src="assets/figma/network-7.svg" alt=""><img class="n1" src="assets/figma/network-7.svg" alt=""><img class="n2" src="assets/figma/network-7.svg" alt=""><img class="n3" src="assets/figma/network-7.svg" alt=""></div>
+  </div><small>Instituto Superior Tecnológico Privado Valle Grande<br>Análisis de Sistemas Empresariales</small>
+ </section>
+ <section class="login-side"><div class="login-box">
+  <div class="eyebrow">ACCESO AL SISTEMA</div><h2>Inicia sesión</h2><p>Ingresa con las credenciales asignadas por tu institución educativa.</p>
+  <form (ngSubmit)="login()" #form="ngForm">
+   <div class="role-note">Tu cuenta determina si ingresas como administrador, convivencia escolar o docente.</div>
+   <label for="email">Correo institucional</label><input id="email" name="email" [(ngModel)]="email" type="email" required email maxlength="254" autocomplete="username" placeholder="nombre.apellido@institucion.edu.pe">
+   <label for="password">Contraseña</label><input id="password" name="password" [(ngModel)]="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+   <div class="login-options"><label class="remember"><input name="remember" type="checkbox" [(ngModel)]="remember"> Recordar mi correo</label><button type="button" class="text-button" (click)="help=!help">¿Olvidaste tu contraseña?</button></div>
+   <p *ngIf="help" role="status">Comunícate con el administrador de tu institución para recuperar el acceso.</p>
+   <p *ngIf="error" class="error" role="alert">{{error}}</p>
+   <button class="login-btn" type="submit" [disabled]="busy||form.invalid">{{busy?'Ingresando…':'Ingresar'}}</button>
+  </form><div class="restricted">acceso restringido</div><p class="note">Solo personal autorizado por la institución educativa puede acceder. Si no tienes una cuenta, comunícate con el administrador del sistema.</p>
+ </div></section>
 </div>

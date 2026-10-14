@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AppShellComponent } from '../../../../shared/components/app-shell/app-shell.component';
-
-@Component({selector:'app-case-detail',standalone:true,imports:[CommonModule,FormsModule,AppShellComponent],templateUrl:'./case-detail.component.html',styleUrl:'./case-detail.component.css'})
+import { Api, Detail, badge, message } from '../../../../core/api';
+@Component({selector:'app-case-detail',standalone:true,imports:[CommonModule,AppShellComponent],templateUrl:'./case-detail.component.html',styleUrl:'./case-detail.component.css'})
 export class FutDetailComponent {
-  code='CB-0141'; status='En evaluación'; action='';
-  constructor(route:ActivatedRoute){route.params.subscribe(p=>this.code=p['id']||'CB-0141')}
-  save(){if(!this.action.trim()){alert('Escribe la acción realizada.');return}alert('Seguimiento guardado correctamente.');this.action=''}
+ private api=inject(Api);private route=inject(ActivatedRoute);detail:Detail|null=null;loading=true;error='';cls=badge;created=typeof history!=='undefined'&&!!history.state?.created;
+ constructor(){this.route.paramMap.subscribe(params=>void this.load(params.get('id')||''));}
+ private request=0;
+ async load(id:string){const request=++this.request;this.loading=true;this.error='';this.detail=null;try{if(!/^[1-9]\d*$/.test(id))throw new Error('El identificador del caso no es válido.');const detail=await this.api.get<Detail>('/cases/'+id);if(request===this.request)this.detail=detail;}catch(e){if(request===this.request)this.error=message(e);}finally{if(request===this.request)this.loading=false;}}
+ label(p:string){return p==='AFECTADO'?'Afectado':p==='TESTIGO'?'Testigo':'Presunto agresor';}
+ get title(){return this.detail?.estudiantes.filter(p=>p.participacion==='AFECTADO').map(p=>p.estudiante.nombres+' '+p.estudiante.apellidos).join(', ')||'Detalle del caso';}
 }
