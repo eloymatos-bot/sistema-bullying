@@ -13,6 +13,10 @@ SQL Server; `fe`, `be` y `db` conservan sus historiales de trabajo.
 | `sistema-bullying-backend/database/` | Diseño y scripts SQL 00–05, incluidos los 50 casos ficticios opcionales. |
 | `docs/` | Reparto de trabajo y entregables pendientes. |
 
+Ampliación hasta S17: [campos y criterios de aceptación](docs/ALCANCE_Y_CRITERIOS.md).
+La API de alta/edición de estudiantes está descrita en [API_ESTUDIANTES](docs/API_ESTUDIANTES.md);
+su pantalla de Angular corresponde a la actividad 25.
+
 ## Preparación en otro equipo
 
 Para Windows, usa el [inicio guiado](docs/INICIO_RAPIDO.md): despues de instalar

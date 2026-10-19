@@ -69,10 +69,7 @@ public class CaseService {
                     throw bad("El estudiante seleccionado no está disponible.");
                 if (!seen.add(person.estudianteId()+":"+person.participacion())) throw bad("Participación de estudiante duplicada.");
             } else {
-                NewStudent raw=person.nuevoEstudiante();
-                if (raw.grado()==null || raw.grado()<1 || raw.grado()>5) throw bad("El grado debe estar entre 1 y 5.");
-                student=new NewStudent(required(raw.nombres(),100,"Nombres"),required(raw.apellidos(),100,"Apellidos"),
-                    raw.grado(),required(raw.seccion(),10,"Sección"));
+                student=pe.vallegrande.bullying.students.StudentService.clean(person.nuevoEstudiante());
             }
             normalized.add(new InvolvedInput(person.estudianteId(),student,person.participacion()));
         }

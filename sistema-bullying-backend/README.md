@@ -12,6 +12,9 @@ el proxy `/api` y se incluye junto al backend en la rama `develop`.
 - Actividad 14: seguimiento transaccional, historial, estados y versiones.
 - Actividades 16–17: consultas de alertas y reportes, con acceso por usuario.
 - Administración: directorio, edición de usuarios y activación/desactivación.
+- Actividad 24: directorio, alta y edición de estudiantes con control de versión.
+  Aplicar `database/06_gestion_estudiantes.sql` antes de ejecutar el backend actualizado.
+  Contrato para Angular y criterios: `../docs/API_ESTUDIANTES.md` y `../docs/ALCANCE_Y_CRITERIOS.md`.
 
 ## Preparación y arranque
 
