@@ -15,6 +15,7 @@ public class AccountService {
     private final PasswordEncoder encoder;
     public static final Set<String> ROLES = Set.of("ADMINISTRADOR", "CONVIVENCIA", "DOCENTE_TUTOR");
     public record CreateUser(String nombres, String apellidos, String correo, String password, String rol) {}
+    public record EditUser(String nombres,String apellidos,String correo,String rol){}
 
     public AccountService(AccountRepository repository, PasswordEncoder encoder) {
         this.repository = repository; this.encoder = encoder;
@@ -60,5 +61,17 @@ public class AccountService {
         if (repository.lockAndCountAdmins() > 0)
             throw new IllegalStateException("Ya existe un administrador activo. No se modificaron sus credenciales.");
         return create(new CreateUser(input.nombres(), input.apellidos(), input.correo(), input.password(), "ADMINISTRADOR"));
+    }
+    @Transactional
+    public Account.UserView edit(long id,EditUser input,String actor){
+        int admins=repository.lockAndCountAdmins();
+        Account current=repository.byId(id).orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"Usuario no encontrado."));
+        if(input==null)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Faltan los datos del usuario.");
+        String nombres=name(input.nombres(),"Nombres"),apellidos=name(input.apellidos(),"Apellidos"),email=normalizeEmail(input.correo());
+        if(email.length()>254||!email.matches("[^\\s@]+@[^\\s@]+\\.[^\\s@]+"))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Correo no válido.");
+        if(input.rol()==null||!ROLES.contains(input.rol()))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Rol no válido.");
+        if(current.correo().equalsIgnoreCase(actor)&&(!input.rol().equals(current.rol())||!email.equals(current.correo())))throw new ResponseStatusException(HttpStatus.CONFLICT,"Conserva el correo y rol de tu propia sesión. Otro administrador puede modificarlos.");
+        if(current.activo()&&current.rol().equals("ADMINISTRADOR")&&!input.rol().equals("ADMINISTRADOR")&&admins<=1)throw new ResponseStatusException(HttpStatus.CONFLICT,"Debe quedar al menos un administrador activo.");
+        repository.edit(id,nombres,apellidos,email,input.rol());return repository.byId(id).orElseThrow().view();
     }
 }

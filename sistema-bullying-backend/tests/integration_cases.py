@@ -11,7 +11,7 @@ def run_cases():
                        ADMIN_NOMBRES="Prueba", ADMIN_APELLIDOS="Temporal")
     result = subprocess.run([str(Path(os.environ['JAVA_HOME']) / 'bin/java.exe'), '-jar',
         'target/sistema-bullying-backend-0.0.1-SNAPSHOT.jar', '--spring.profiles.active=local',
-        '--spring.config.additional-location=file:./.local/'], cwd=ROOT, env=environment,
+        CONFIG_ARGUMENT], cwd=ROOT, env=environment,
         capture_output=True, text=True, errors='replace', timeout=45)
     assert result.returncode == 0, 'No se pudo crear el administrador de prueba'
     admin = Client()

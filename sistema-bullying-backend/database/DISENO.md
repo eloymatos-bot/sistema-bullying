@@ -58,8 +58,8 @@ La actividad 10 implementa normalización del correo, hashes de contraseñas,
 permisos para administrar usuarios y comprobación de cuenta activa.
 La actividad 11 implementa registro con afectado y responsable activo, permisos
 de consulta, fecha de incidente no futura y estado inicial REPORTADO.
-Las transiciones, seguimientos, control de edición concurrente y desactivación
-de estudiantes de la lista siguiente quedan para las próximas actividades:
+La actividad 14 implementa transiciones secuenciales, seguimientos y control de
+edición concurrente por ROWVERSION. La desactivación de estudiantes sigue pendiente.
 
 - Normalizar y validar el correo; generar y verificar hashes de contraseña mediante
   Spring Security. La restricción de longitud de SQL no demuestra que un hash sea válido.
@@ -110,7 +110,11 @@ significa que las funciones de seguimiento, alertas o reportes estén terminadas
 - Actividad 10: usuarios/login implementados con sesiones, roles y contraseñas BCrypt.
 - Actividad 11: registro y consulta de casos implementados en Spring Boot, con filtros,
   estudiantes, responsable, estado inicial REPORTADO y acceso por rol. Las altas son
-  transaccionales; Angular se conectará en la actividad de integración.
+  transaccionales; Angular ya está conectado.
+- Actividades 14–17: seguimiento, estados, historial, alertas y estadísticas implementados.
+  Se aplican permisos del script `04_permisos_seguimiento.sql`, sin modificar el esquema.
+  Los vencimientos parten de fechas programadas; casos sin fecha se señalan como
+  pendientes de programación. Las estadísticas no agregan tablas redundantes.
 
 Los scripts solo contienen catálogos. No se incorporan los nombres de ejemplo del
 frontend ni datos reales de menores a la base.

@@ -16,6 +16,10 @@ import urllib.parse
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
+LOCAL_CONFIG = ROOT / '.local'
+if not (LOCAL_CONFIG / 'application-local.properties').exists():
+    LOCAL_CONFIG = ROOT.parent / '.local'
+CONFIG_ARGUMENT = '--spring.config.additional-location=' + LOCAL_CONFIG.as_uri() + '/'
 BASE = os.environ.get("TEST_BASE_URL", "http://127.0.0.1:8080")
 PREFIX = "test_" + secrets.token_hex(10)
 ADMIN = PREFIX + "_admin@example.invalid"
@@ -83,10 +87,10 @@ def run():
     environment.update(BOOTSTRAP_ADMIN="true", ADMIN_EMAIL=ADMIN, ADMIN_PASSWORD=PASSWORD,
                        ADMIN_NOMBRES="Prueba", ADMIN_APELLIDOS="Temporal")
     boot = subprocess.run([java, "-jar", "target/sistema-bullying-backend-0.0.1-SNAPSHOT.jar",
-                           "--spring.profiles.active=local", "--spring.config.additional-location=file:./.local/"],
+                           "--spring.profiles.active=local", CONFIG_ARGUMENT],
                           cwd=ROOT, env=environment, capture_output=True, text=True, errors="replace", timeout=45)
     if boot.returncode:
-        (ROOT / ".local" / "bootstrap-test.log").write_text(boot.stdout + boot.stderr, encoding="utf-8")
+        (LOCAL_CONFIG / "bootstrap-test.log").write_text(boot.stdout + boot.stderr, encoding="utf-8")
         raise RuntimeError("Falló la creación del administrador ficticio; revisar .local/bootstrap-test.log")
 
     anonymous = Client()

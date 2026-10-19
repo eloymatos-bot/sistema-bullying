@@ -24,6 +24,8 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Account.UserView create(@RequestBody AccountService.CreateUser input) { return service.create(input); }
+    @PutMapping("/{id}")
+    public Account.UserView edit(@PathVariable long id,@RequestBody AccountService.EditUser input,Principal actor){return service.edit(id,input,actor.getName());}
 
     public record StatusInput(Boolean activo) {}
     @PatchMapping("/{id}/status")

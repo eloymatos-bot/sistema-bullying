@@ -38,4 +38,7 @@ public class AccountRepository {
     public void setActive(long id, boolean active) {
         jdbc.update("UPDATE dbo.usuarios SET activo=? WHERE id=?", active, id);
     }
+    public void edit(long id,String nombres,String apellidos,String correo,String rol){
+        jdbc.update("UPDATE dbo.usuarios SET nombres=?,apellidos=?,correo=?,rol_codigo=? WHERE id=?",nombres,apellidos,correo,rol,id);
+    }
 }

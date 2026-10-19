@@ -34,7 +34,7 @@ public class SecurityConfig {
                                  @Value("${app.allowed-origin}") String origin) throws Exception {
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(List.of(origin));
-        cors.setAllowedMethods(List.of("GET", "POST", "PATCH", "OPTIONS"));
+        cors.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "OPTIONS"));
         cors.setAllowedHeaders(List.of("Content-Type", "X-CSRF-TOKEN"));
         cors.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -44,7 +44,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(a -> a
             .requestMatchers("/api/auth/csrf", "/api/auth/login").permitAll()
             .requestMatchers("/api/users", "/api/users/**").hasRole("ADMINISTRADOR")
-            .requestMatchers("/api/cases", "/api/cases/**", "/api/students")
+            .requestMatchers("/api/cases", "/api/cases/**", "/api/students", "/api/alerts", "/api/reports")
                 .hasAnyRole("ADMINISTRADOR", "CONVIVENCIA", "DOCENTE_TUTOR")
             .requestMatchers("/api/auth/me").authenticated()
             .anyRequest().denyAll());

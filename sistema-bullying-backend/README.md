@@ -9,6 +9,9 @@ conectará en las actividades de integración del cronograma.
 - Actividad 9: base `SistemaBullying` creada y probada.
 - Actividad 10: usuarios e inicio/cierre de sesión implementados y probados contra SQL Server.
 - Actividad 11: registro y consulta de casos, estudiantes, filtros y acceso por rol.
+- Actividad 14: seguimiento transaccional, historial, estados y versiones.
+- Actividades 16–17: consultas de alertas y reportes, con acceso por usuario.
+- Administración: directorio, edición de usuarios y activación/desactivación.
 
 ## Preparación y arranque
 
@@ -95,7 +98,8 @@ iniciar sesión y consultar su perfil, pero no administrar otros usuarios.
   usar proxy Angular para `/api` y el mismo hostname; no mezclar localhost y
   127.0.0.1 para las cookies SameSite.
 
-Pendientes: recuperación de contraseña, edición de roles e integración de pantallas.
+Pendiente: recuperación de contraseña mediante autoservicio. Las pantallas de
+login, casos, seguimiento, alertas, reportes y usuarios ya están conectadas.
 
 ## API de la actividad 11
 
@@ -140,7 +144,34 @@ El autor se toma de la sesión; el estado inicial siempre es REPORTADO.
 La respuesta de detalle incluye `caso`, `descripcion`, `observaciones` y `estudiantes`.
 Los listados de casos y estudiantes incluyen `items`, `total`, `offset`, `limit` (máximo 100).
 La búsqueda de casos usa código, lugar o nombre del estudiante; los filtros se combinan.
-No se implementan aún cambios de estado, seguimientos ni borrado de casos.
+Los cambios de estado y seguimientos se describen a continuación. No se expone borrado de casos.
+
+## Seguimiento y consultas agregadas
+
+| Método y ruta | Función |
+|---|---|
+| `GET /api/cases/{id}/followups` | Versión hexadecimal, estado, próxima fecha, permiso de edición e historial. |
+| `POST /api/cases/{id}/followups` | Guarda acción y caso en una transacción; devuelve 201. |
+| `GET /api/alerts` | Resumen y listado paginado; `q`, `clase`, `responsableId`, `offset`, `limit`. |
+| `GET /api/reports?year=2026` | Estadísticas del año de registro en hora de Perú, con ámbito del usuario. |
+| `GET /api/users/directory` | Solo administrador; `q`, `rol`, `activo`, `offset`, `limit`, totales y listado sin hashes. |
+| `PUT /api/users/{id}` | Solo administrador; edita nombres, apellidos, correo y rol, conserva contraseña y actividad. |
+
+El seguimiento recibe `version`, `accion`, `fechaAccion`, `estado`, `proximaFecha`.
+Es obligatorio conservar el estado o avanzar un paso: REPORTADO → EN_EVALUACION →
+EN_SEGUIMIENTO → CERRADO. Un caso cerrado queda para consulta. No hay reaperturas.
+La fecha de acción va del incidente a hoy (America/Lima). La próxima fecha es
+opcional y no puede ser anterior a hoy. Cerrar exige próxima fecha nula.
+Se bloquea el caso para guardar, verifica ROWVERSION y agrega el historial en la
+misma transacción. Versión desactualizada: 409 sin insertar acciones parciales.
+Administración y convivencia editan; docentes solo si son responsables asignados.
+
+Alertas: VENCIDA, PROXIMA, EVALUACION y SIN_FECHA. Las dos últimas no tienen plazo
+de vencimiento inventado. «Atendidas» cuenta casos con acciones fechadas en el mes.
+Los contadores de alertas son del ámbito completo; los filtros solo afectan el listado.
+Los reportes filtran por fecha de creación del caso en Perú, no por fecha del incidente;
+estados y cierres son los actuales de esos registros, incluso si cerraron después.
+Los promedios usan segundos transcurridos / 86400, solo para casos cerrados.
 
 ## Base de datos
 
@@ -148,7 +179,8 @@ No se implementan aún cambios de estado, seguimientos ni borrado de casos.
 2. `database/01_esquema_inicial.sql`: ocho tablas, once claves foráneas y catálogos.
 3. `database/02_verificar_base.sql`: prueba restricciones y revierte datos ficticios.
 4. `database/03_permisos_aplicacion.sql`: permisos mínimos para el usuario SQL `bullying_app`, previamente creado por el administrador.
-5. `database/DISENO.md`: campos, relaciones y reglas.
+5. `database/04_permisos_seguimiento.sql`: lectura/inserción de historial y actualización de estado/fechas de casos.
+6. `database/DISENO.md`: campos, relaciones y reglas.
 
 Ejecutar manualmente con una cuenta autorizada. Spring Boot no crea ni altera
 el esquema. El script inicial se detiene si ya hay tablas; usar migraciones después.
