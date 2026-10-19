@@ -1,6 +1,7 @@
 package pe.vallegrande.bullying.security;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpMethod;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +45,9 @@ public class SecurityConfig {
         http.authorizeHttpRequests(a -> a
             .requestMatchers("/api/auth/csrf", "/api/auth/login").permitAll()
             .requestMatchers("/api/users", "/api/users/**").hasRole("ADMINISTRADOR")
+            .requestMatchers(HttpMethod.POST,"/api/students").hasAnyRole("ADMINISTRADOR","CONVIVENCIA")
+            .requestMatchers(HttpMethod.PUT,"/api/students/*").hasAnyRole("ADMINISTRADOR","CONVIVENCIA")
+            .requestMatchers(HttpMethod.GET,"/api/students/**").hasAnyRole("ADMINISTRADOR","CONVIVENCIA","DOCENTE_TUTOR")
             .requestMatchers("/api/cases", "/api/cases/**", "/api/students", "/api/alerts", "/api/reports")
                 .hasAnyRole("ADMINISTRADOR", "CONVIVENCIA", "DOCENTE_TUTOR")
             .requestMatchers("/api/auth/me").authenticated()
