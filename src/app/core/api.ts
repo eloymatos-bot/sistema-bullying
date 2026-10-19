@@ -13,6 +13,15 @@ export interface Catalogs { tipos:Catalog[]; estados:Catalog[]; participaciones:
 export interface Responsible { id:number; nombres:string; apellidos:string; rol:string }
 export interface PersonInput { estudianteId?:number; nuevoEstudiante?:{nombres:string;apellidos:string;grado:number;seccion:string}; participacion:string }
 export interface CreateCase { fechaIncidente:string; lugar:string; tipoCodigo:string; descripcion:string; observaciones:string|null; responsableId:number; estudiantes:PersonInput[] }
+export interface FollowUp { id:number; accion:string; fechaAccion:string; registradoEn:string; autor:string; estadoAnterior:string|null; estadoNuevo:string|null; proximaFecha:string|null }
+export interface Timeline { version:string; estado:string; proximaFecha:string|null; puedeEditar:boolean; historial:FollowUp[] }
+export interface AlertItem {id:number;codigo:string;estudiantes:string;responsableId:number;responsable:string;clase:string;fecha:string|null;ultimaAccion:string|null}
+export interface Alerts {resultados:Page<AlertItem>;vencidas:number;proximas:number;atendidas:number;sinFecha:number}
+export interface Group {codigo:string;nombre:string;total:number}
+export interface Report {year:number;total:number;cerrados:number;promedioDias:number|null;vencidos:number;totalAnterior:number;tipos:Group[];estados:Group[];meses:{mes:number;registrados:number;cerrados:number;promedioDias:number|null}[]}
+export interface Directory {resultados:Page<User>;activos:number;convivencia:number;docentes:number}
+export function limaToday(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Lima',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());}
+export function stateName(state:string){return ({REPORTADO:'Reportado',EN_EVALUACION:'En evaluación',EN_SEGUIMIENTO:'En seguimiento',CERRADO:'Cerrado'} as Record<string,string>)[state]||state;}
 
 export function message(error:unknown):string {
   if (error instanceof HttpErrorResponse) {
@@ -38,9 +47,9 @@ export class Api {
     try { return await firstValueFrom(this.http.get<T>('/api'+path,{params})); }
     catch(e) { if(e instanceof HttpErrorResponse && e.status===401){this.user.set(null); void this.router.navigate(['/login']);} throw e; }
   }
-  async write<T>(path:string, body:unknown) {
+  async write<T>(path:string, body:unknown,method:'POST'|'PUT'|'PATCH'='POST') {
     const token=await this.csrf();
-    try { return await firstValueFrom(this.http.post<T>('/api'+path,body,{headers:{[token.headerName]:token.token}})); }
+    try { return await firstValueFrom(this.http.request<T>(method,'/api'+path,{body,headers:{[token.headerName]:token.token}})); }
     catch(e) { if(e instanceof HttpErrorResponse && e.status===401){this.user.set(null); void this.router.navigate(['/login']);} throw e; }
   }
   async login(email:string,password:string) {

@@ -63,7 +63,10 @@ async function main(){
   await page.goto(base+'/cases/9223372036854775807');await page.getByRole('alert').waitFor();
   await check('caso inexistente no muestra ejemplo estático',async()=>assert.equal(await page.locator('.detail-grid').count(),0));
   await page.goto(detailUrl);await page.locator('.detail-grid').waitFor();
-  await check('seguimiento no finge guardado',async()=>assert.equal(await page.getByRole('button',{name:'Guardar seguimiento'}).count(),0));
+  await check('seguimiento real disponible sin historial ficticio',async()=>{
+   assert.equal(await page.getByRole('button',{name:'Guardar seguimiento'}).count(),1);
+   assert.equal(await page.locator('.history-entry').count(),1);
+  });
   await page.setViewportSize({width:390,height:844});
   await check('detalle móvil sin desbordamiento horizontal',async()=>assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)));
   await page.screenshot({path:path.join(out,'06-movil.png'),fullPage:true});

@@ -1,7 +1,8 @@
 # Convivencia escolar — Angular conectado a Spring Boot
 
-Actividad 12: login y casos conectados a SQL Server a través del backend de la rama
-`be`. Diseño revisado con el MCP de Figma el 14/10/2026.
+Actividades 12 y 14–17: login, casos, seguimiento, alertas y reportes conectados a
+SQL Server a través del backend de la rama `be`. También se implementó la pantalla
+de administración de usuarios. Diseño revisado con Figma y Desktop Bridge.
 
 ## Iniciar en este proyecto
 
@@ -50,10 +51,33 @@ El selector de rol del login se reemplaza por una explicación: el permiso perte
 a la cuenta autenticada. El campo libre de estudiantes pasa a datos estructurados.
 Los filtros muestran las opciones implementadas en la API (tipo y rango de fechas).
 
-Seguimientos, cambios de estado, alertas, reportes y la pantalla de administración
-de usuarios todavía no están conectados. Se muestran como pendientes; ya no anuncian
-guardados ficticios ni presentan ejemplos como datos reales. Los componentes antiguos
-de esas pantallas se conservan en el código para las próximas actividades.
+## Seguimiento, alertas, reportes y usuarios
+
+- En el detalle del caso se guardan acciones, fecha, siguiente atención y cambios
+  de estado. Orden: Reportado → En evaluación → En seguimiento → Cerrado. Se permite
+  registrar otra acción conservando el estado actual, excepto en casos cerrados.
+- Administración y convivencia pueden registrar seguimiento; los docentes solo
+  en sus casos asignados. Un docente que reportó un caso puede consultarlo aunque
+  se haya asignado a otro responsable, pero no registrar sus acciones.
+- Cada guardado actualiza el caso y agrega el historial en una sola transacción.
+  Si otra persona modificó la versión, se conserva el borrador y se pide recargar.
+- Alertas: fechas vencidas, próximas (hoy a hoy + 7 días) y casos sin fecha. No se
+  inventan plazos para evaluaciones pendientes. Los casos cerrados no aparecen.
+  «Atendidas» cuenta casos con al menos una acción fechada en el mes actual, no
+  alertas resueltas. Los contadores respetan el acceso del usuario y no los filtros.
+- Reportes por año de registro en hora de Perú: tipos, estados actuales, registros
+  mensuales y promedio de tiempo desde registro hasta cierre. Los cierres de cada
+  mes pertenecen a los casos registrados en ese mes. «—» significa que no hay cierres.
+  Se incluyen los seis tipos del catálogo y todos los meses, incluso con cero casos.
+- La opción «Imprimir / guardar PDF» abre el diálogo del navegador. Seleccionar
+  «Guardar como PDF» para exportar; la vista impresa oculta la navegación y filtros.
+- Solo administración accede a usuarios: alta, búsqueda por nombre/correo, filtros
+  por rol/estado, edición y activación/desactivación con confirmación. No hay borrado
+  de historial. Se conserva al menos un administrador activo; tu propia cuenta
+  conserva su rol y correo mientras está en uso.
+
+La contraseña inicial solo se solicita al crear una cuenta; la edición no cambia
+contraseñas. Para restablecimientos, usar un procedimiento administrativo local.
 
 ## Verificación
 
@@ -70,3 +94,13 @@ persistencia y recarga, búsqueda, filtros, detalle inexistente, resumen actuali
 logout, acceso restringido de docentes y presentación móvil sin desbordamiento.
 
 Referencia: https://www.figma.com/design/LsFEGyJIy1aRbBTWh5dTXH/Dashboard?node-id=0-1
+
+`tests/run_remaining.py` verifica los nuevos flujos con datos existentes en desarrollo.
+Crea cuentas ficticias con prefijo aleatorio y únicamente elimina sus propios datos
+al terminar, sin tocar el administrador del proyecto ni casos ajenos. Requiere los
+mismos componentes y variables que la suite anterior. Capturas y PDF de prueba en
+`.local/remaining/`, excluidos de GitHub.
+
+Comprueba: transacciones, permisos, cambios de estado, conflicto de versiones,
+alertas por fechas, agregados estadísticos, alta/edición/desactivación/reactivación de
+usuarios, revocación de sesión, navegación, impresión PDF y pantallas móviles.

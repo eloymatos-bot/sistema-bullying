@@ -6,8 +6,10 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 BACKEND=ROOT.parent/'sistema-bullying-backend'
+if not (BACKEND/'pom.xml').exists():
+    BACKEND=BACKEND/'sistema-bullying-backend'
 sys.path.insert(0,str(BACKEND/'tests'))
-from integration_auth import sql, PREFIX, ADMIN, PASSWORD
+from integration_auth import sql, PREFIX, ADMIN, PASSWORD, CONFIG_ARGUMENT
 
 def run():
     assert sql('SELECT COUNT(*) FROM dbo.usuarios')=='0', 'Usar una base de desarrollo sin usuarios.'
@@ -16,7 +18,7 @@ def run():
         ADMIN_NOMBRES='Prueba',ADMIN_APELLIDOS='Temporal')
     boot=subprocess.run([str(Path(os.environ['JAVA_HOME'])/'bin/java.exe'),'-jar',
         'target/sistema-bullying-backend-0.0.1-SNAPSHOT.jar','--spring.profiles.active=local',
-        '--spring.config.additional-location=file:./.local/'],cwd=BACKEND,env=environment,
+        CONFIG_ARGUMENT],cwd=BACKEND,env=environment,
         capture_output=True,text=True,errors='replace',timeout=60)
     assert boot.returncode==0,'No se pudo crear la cuenta ficticia'
     environment=os.environ.copy()

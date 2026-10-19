@@ -1,14 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AppShellComponent } from '../../../../shared/components/app-shell/app-shell.component';
-
-@Component({selector:'app-tracking',standalone:true,imports:[CommonModule,AppShellComponent],templateUrl:'./tracking.component.html',styleUrl:'./tracking.component.css'})
+import { Api, Alerts, Responsible, message } from '../../../../core/api';
+@Component({selector:'app-tracking',standalone:true,imports:[CommonModule,FormsModule,RouterLink,AppShellComponent],templateUrl:'./tracking.component.html',styleUrl:'./tracking.component.css'})
 export class TrackingComponent {
-  alerts=[
-    ['CB-0139','A. Torres Vega','Seguimiento vencido','Última acción registrada hace 8 días. Responsable: J. Paredes','Venció 18 ago'],
-    ['CB-0135','P. Salas Díaz','Seguimiento vencido','Última acción registrada hace 6 días. Responsable: J. Paredes','Venció 20 ago'],
-    ['CB-0142','J. Ramírez Soto','Evaluación pendiente','Caso reportado hace 2 días, aún sin evaluar. Responsable: M. Rojas','Venció 22 ago'],
-    ['CB-0141','D. Chávez Lino','Próximo seguimiento','Revisar avance del caso. Responsable: M. Rojas','Vence 27 ago'],
-    ['CB-0140','M. López Díaz','Próximo seguimiento','Confirmar que continúa la situación. Responsable: M. Rojas','Vence 29 ago']
-  ];
+ private api=inject(Api);data:Alerts|null=null;responsibles:Responsible[]=[];search='';clase='';responsable='';offset=0;limit=20;loading=true;error='';private request=0;
+ constructor(){void this.load();void this.api.allResponsibles().then(r=>this.responsibles=r).catch(()=>{});}
+ async load(offset=0){const request=++this.request;this.loading=true;this.error='';this.offset=offset;try{const params:Record<string,string|number>={q:this.search,clase:this.clase,offset,limit:this.limit};if(this.responsable)params['responsableId']=this.responsable;const data=await this.api.get<Alerts>('/alerts',params);if(request===this.request)this.data=data;}catch(e){if(request===this.request)this.error=message(e);}finally{if(request===this.request)this.loading=false;}}
+ label(c:string){return ({VENCIDA:'Seguimiento vencido',PROXIMA:'Próximo seguimiento',EVALUACION:'Evaluación pendiente',SIN_FECHA:'Seguimiento sin fecha'} as Record<string,string>)[c]||c;}
+ get end(){return Math.min(this.offset+(this.data?.resultados.items.length||0),this.data?.resultados.total||0);}
 }

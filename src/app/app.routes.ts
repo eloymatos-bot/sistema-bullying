@@ -5,7 +5,9 @@ import { FutListComponent } from './features/cases/pages/case-list/case-list.com
 import { FutCreateComponent } from './features/cases/pages/case-create/case-create.component';
 import { FutDetailComponent } from './features/cases/pages/case-detail/case-detail.component';
 import { sessionGuard, adminGuard } from './core/api';
-import { PendingComponent } from './shared/components/pending.component';
+import { TrackingComponent } from './features/tracking/pages/tracking/tracking.component';
+import { ReportsComponent } from './features/reports/pages/reports/reports.component';
+import { UserListComponent } from './features/users/pages/user-list/user-list.component';
 export const routes:Routes=[
  {path:'',redirectTo:'home',pathMatch:'full'},
  {path:'login',component:LoginComponent},
@@ -14,9 +16,9 @@ export const routes:Routes=[
   {path:'cases',component:FutListComponent},
   {path:'cases/nuevo',component:FutCreateComponent},
   {path:'cases/:id',component:FutDetailComponent},
-  {path:'seguimiento',component:PendingComponent,data:{title:'Alertas'}},
-  {path:'reportes',component:PendingComponent,data:{title:'Reportes'}},
-  {path:'usuarios',component:PendingComponent,canActivate:[adminGuard],data:{title:'Usuarios'}}
+  {path:'seguimiento',component:TrackingComponent},
+  {path:'reportes',component:ReportsComponent},
+  {path:'usuarios',component:UserListComponent,canActivate:[adminGuard]}
  ]},
  {path:'**',redirectTo:'home'}
 ];
