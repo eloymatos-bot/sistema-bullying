@@ -15,6 +15,12 @@ SQL Server; `fe`, `be` y `db` conservan sus historiales de trabajo.
 
 ## Preparación en otro equipo
 
+Para Windows, usa el [inicio guiado](docs/INICIO_RAPIDO.md): despues de instalar
+los requisitos y preparar SQL Server local, ejecuta `./Preparar-proyecto.ps1`
+una sola vez y `./Iniciar-proyecto.ps1` cada vez que trabajes. El asistente crea
+tu propia cuenta del dashboard y conserva las cuentas existentes al repetirse.
+Puedes agregar `-DatosDemo` a la preparacion para cargar los 50 casos ficticios.
+
 Requisitos: Node.js compatible con Angular 19, npm, Java 17 o superior, Maven y
 SQL Server. La base de datos se ejecuta en SQL Server, fuera de Angular.
 

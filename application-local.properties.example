@@ -1,0 +1,4 @@
+# Referencia: el asistente genera .local/application-local.properties con valores propios.
+spring.datasource.url=jdbc:sqlserver://127.0.0.1:1433;databaseName=SistemaBullying;encrypt=true;trustServerCertificate=true;loginTimeout=5
+spring.datasource.username=TU_USUARIO_SQL
+spring.datasource.password=TU_CLAVE_SQL
