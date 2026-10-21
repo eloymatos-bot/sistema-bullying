@@ -1,0 +1,429 @@
+{
+  "info": {
+    "name": "Sistema Bullying - Estudiantes",
+    "description": "Solicitudes listas para el backend local. Leer postman/README.md. Orden inicial: 01,02,03; despues elegir la operacion. La coleccion conserva id/version del ultimo alumno creado o consultado. No incluye contrasenas ni cookies. Crear escribe datos ficticios; no hay borrado.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "noauth"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8080",
+      "type": "string"
+    },
+    {
+      "key": "email",
+      "value": "admin@institucion.edu.pe",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "csrfToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentVersion",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentNames",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentSurnames",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Usar No environment para que otras variables no reemplacen las de la coleccion.",
+          "const base = String(pm.variables.get('baseUrl') || '');",
+          "if (!/^http:\\/\\/(127\\.0\\.0\\.1|localhost):[0-9]{1,5}$/.test(base)) {",
+          "    pm.execution.skipRequest(); throw new Error('baseUrl debe apuntar al backend local, por ejemplo http://127.0.0.1:8080');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Obtener token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/auth/csrf",
+        "description": "Primer paso para iniciar sesion. El token se guarda solo."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.unset('csrfToken');",
+              "pm.test('Token recibido', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.headerName).to.eql('X-CSRF-TOKEN');",
+              "    pm.expect(data.token).to.be.a('string').and.not.empty;",
+              "    pm.collectionVariables.set('csrfToken', data.token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "02 Iniciar sesion",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-CSRF-TOKEN",
+            "value": "{{csrfToken}}",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "description": "Configura email y password en Variables de la coleccion antes de enviar. Luego ejecuta 03.",
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "email",
+              "value": "{{email}}",
+              "type": "text"
+            },
+            {
+              "key": "password",
+              "value": "{{password}}",
+              "type": "text"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function stop(message) { pm.execution.skipRequest(); throw new Error(message); }",
+              "if (!pm.collectionVariables.get('csrfToken')) stop('Ejecuta 01 Obtener token; despues de iniciar sesion ejecuta 03 Renovar token.');",
+              "",
+              "if (!pm.collectionVariables.get('email') || !pm.collectionVariables.get('password')) stop('Completa email y password en Variables de Sistema Bullying.');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.unset('csrfToken');",
+              "pm.collectionVariables.unset('studentId');",
+              "pm.collectionVariables.unset('studentVersion');",
+              "pm.test('Sesion iniciada', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "03 Renovar token despues del login",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/auth/csrf",
+        "description": "Ejecutar despues de 02. No copiar tokens manualmente."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.unset('csrfToken');",
+              "pm.test('Token recibido', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(data.headerName).to.eql('X-CSRF-TOKEN');",
+              "    pm.expect(data.token).to.be.a('string').and.not.empty;",
+              "    pm.collectionVariables.set('csrfToken', data.token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "04 Crear estudiante de prueba",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-CSRF-TOKEN",
+            "value": "{{csrfToken}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/api/students",
+        "description": "Crea UN alumno por envio y guarda su id/version automaticamente. Repetir Send crea otro alumno.",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombres\": \"Prueba Postman\",\n  \"apellidos\": \"Ficticio\",\n  \"grado\": 2,\n  \"seccion\": \"A\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function stop(message) { pm.execution.skipRequest(); throw new Error(message); }",
+              "if (!pm.collectionVariables.get('csrfToken')) stop('Ejecuta 01 Obtener token; despues de iniciar sesion ejecuta 03 Renovar token.');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estudiante recibido', function () {",
+              "    pm.response.to.have.status(201);",
+              "    const data = pm.response.json();",
+              "    pm.expect(Number.isSafeInteger(data.id) && data.id > 0).to.eql(true);",
+              "    pm.expect(data.version).to.match(/^[0-9a-fA-F]{16}$/);",
+              "    pm.collectionVariables.set('studentId', String(data.id));",
+              "    pm.collectionVariables.set('studentVersion', data.version);",
+              "    pm.collectionVariables.set('studentNames', data.nombres);",
+              "    pm.collectionVariables.set('studentSurnames', data.apellidos);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "05 Listar estudiantes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/students/directory?q=Prueba%20Postman&offset=0&limit=20",
+        "description": "Busca los alumnos ficticios creados con 04. Puedes cambiar q o agregar grado y seccion en Params."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Listado recibido', function () { pm.response.to.have.status(200); pm.expect(pm.response.json().items).to.be.an('array'); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "06 Consultar estudiante",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/students/{{studentId}}",
+        "description": "Consulta el id guardado. Guarda su version y nombres actuales para editar sin perderlos."
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (!/^[1-9][0-9]*$/.test(String(pm.collectionVariables.get('studentId') || ''))) {",
+              "    pm.execution.skipRequest(); throw new Error('Primero ejecuta 04 Crear estudiante o indica studentId y ejecuta 06 Consultar estudiante.');",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estudiante recibido', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(Number.isSafeInteger(data.id) && data.id > 0).to.eql(true);",
+              "    pm.expect(data.version).to.match(/^[0-9a-fA-F]{16}$/);",
+              "    pm.collectionVariables.set('studentId', String(data.id));",
+              "    pm.collectionVariables.set('studentVersion', data.version);",
+              "    pm.collectionVariables.set('studentNames', data.nombres);",
+              "    pm.collectionVariables.set('studentSurnames', data.apellidos);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "07 Editar estudiante",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "X-CSRF-TOKEN",
+            "value": "{{csrfToken}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/api/students/{{studentId}}",
+        "description": "Cambia a grado 3/seccion B. Conserva los nombres consultados y actualiza la version automaticamente. Si responde 409, ejecutar 06 y revisar antes de reenviar.",
+        "body": {
+          "mode": "raw",
+          "raw": "{{studentEditBody}}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function stop(message) { pm.execution.skipRequest(); throw new Error(message); }",
+              "if (!pm.collectionVariables.get('csrfToken')) stop('Ejecuta 01 Obtener token; despues de iniciar sesion ejecuta 03 Renovar token.');",
+              "",
+              "if (!/^[1-9][0-9]*$/.test(String(pm.collectionVariables.get('studentId') || ''))) {",
+              "    pm.execution.skipRequest(); throw new Error('Primero ejecuta 04 Crear estudiante o indica studentId y ejecuta 06 Consultar estudiante.');",
+              "}",
+              "",
+              "if (!/^[0-9a-fA-F]{16}$/.test(String(pm.collectionVariables.get('studentVersion') || ''))) stop('Ejecuta 06 para consultar la version actual.');",
+              "pm.variables.set('studentEditBody', JSON.stringify({nombres:pm.collectionVariables.get('studentNames'),apellidos:pm.collectionVariables.get('studentSurnames'),grado:3,seccion:'B',version:pm.collectionVariables.get('studentVersion')}));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Estudiante recibido', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const data = pm.response.json();",
+              "    pm.expect(Number.isSafeInteger(data.id) && data.id > 0).to.eql(true);",
+              "    pm.expect(data.version).to.match(/^[0-9a-fA-F]{16}$/);",
+              "    pm.collectionVariables.set('studentId', String(data.id));",
+              "    pm.collectionVariables.set('studentVersion', data.version);",
+              "    pm.collectionVariables.set('studentNames', data.nombres);",
+              "    pm.collectionVariables.set('studentSurnames', data.apellidos);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "08 Ver mi cuenta",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/auth/me",
+        "description": "Comprueba que la sesion sigue vigente y muestra tu rol."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Cuenta autenticada', function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    },
+    {
+      "name": "09 Cerrar sesion",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-CSRF-TOKEN",
+            "value": "{{csrfToken}}",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/logout",
+        "description": "Termina la sesion y elimina el token guardado si responde correctamente."
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function stop(message) { pm.execution.skipRequest(); throw new Error(message); }",
+              "if (!pm.collectionVariables.get('csrfToken')) stop('Ejecuta 01 Obtener token; despues de iniciar sesion ejecuta 03 Renovar token.');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Sesion cerrada', function () { pm.response.to.have.status(204); pm.collectionVariables.unset('csrfToken'); pm.collectionVariables.unset('studentVersion'); });"
+            ]
+          }
+        }
+      ],
+      "response": []
+    }
+  ]
+}

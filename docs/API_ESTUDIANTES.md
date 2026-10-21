@@ -1,5 +1,9 @@
 # Actividad 24: gestión de estudiantes
 
+Para probar sin cambiar una misma solicitud, importa la [colección de Postman](../postman/Sistema-Bullying.postman_collection.json).
+La [guía paso a paso](../postman/README.md) explica cómo guardar la contraseña local;
+el token, id y versión se capturan automáticamente.
+
 Aplicar `sistema-bullying-backend/database/06_gestion_estudiantes.sql` con una cuenta
 administradora antes de iniciar el backend actualizado. Es repetible: añade
 `estudiantes.version` si falta, sin modificar nombres ni vínculos existentes.
