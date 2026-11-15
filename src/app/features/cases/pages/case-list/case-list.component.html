@@ -1,0 +1,15 @@
+<app-shell title="Casos registrados" eyebrow="GESTIÓN DE CASOS"><div class="page">
+ <form class="filters" (ngSubmit)="load()">
+  <label class="search"><span class="sr-only">Buscar casos</span><img src="assets/figma/search.svg" alt=""><input name="q" [(ngModel)]="search" maxlength="100" placeholder="Buscar por estudiante, lugar o código"></label>
+  <label><span class="sr-only">Estado</span><select aria-label="Estado" name="state" [(ngModel)]="status"><option value="">Todos los estados</option><option *ngFor="let s of catalogs.estados" [value]="s.codigo">{{s.nombre}}</option></select></label>
+  <label><span class="sr-only">Tipo de incidente</span><select name="type" [(ngModel)]="type"><option value="">Todos los tipos</option><option *ngFor="let t of catalogs.tipos" [value]="t.codigo">{{t.nombre}}</option></select></label>
+  <label>Desde<input type="date" name="desde" [(ngModel)]="desde"></label><label>Hasta<input type="date" name="hasta" [(ngModel)]="hasta"></label>
+  <button class="btn-primary" [disabled]="loading">Buscar</button><button type="button" class="btn-secondary" (click)="clear()" [disabled]="loading">Limpiar</button>
+ </form>
+ <p *ngIf="error" class="error" role="alert">{{error}}</p><p *ngIf="loading" role="status">Cargando casos…</p>
+ <section class="card-panel table-panel" *ngIf="!loading&&!error"><div class="table-scroll"><table class="table"><thead><tr><th>Código</th><th>Estudiante afectado</th><th>Tipo</th><th>Lugar</th><th>Fecha</th><th>Estado</th><th>Responsable</th><th></th></tr></thead><tbody>
+  <tr *ngFor="let r of rows"><td>{{r.codigo}}</td><td>{{r.students}}</td><td>{{r.tipo}}</td><td>{{r.lugar}}</td><td>{{r.fechaIncidente | date:'dd/MM/yyyy'}}</td><td><span class="badge" [ngClass]="cls(r.estadoCodigo)">{{r.estado}}</span></td><td>{{r.responsable}}</td><td><a [routerLink]="['/cases',r.id]" class="link">Ver caso →</a></td></tr>
+  <tr *ngIf="!rows.length"><td colspan="8" class="empty">No hay casos que coincidan con la búsqueda. <a routerLink="/cases/nuevo" class="link">Registrar un caso</a></td></tr>
+ </tbody></table></div><div class="pagination"><span>{{total?offset+1:0}}–{{end}} de {{total}} casos</span><div><button class="btn-secondary" (click)="load(offset-limit)" [disabled]="offset===0">Anterior</button><button class="btn-secondary" (click)="load(offset+limit)" [disabled]="end>=total">Siguiente</button></div></div></section>
+</div></app-shell>
+
