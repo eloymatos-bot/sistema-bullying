@@ -1,0 +1,63 @@
+<app-shell title="Estudiantes" eyebrow="CONVIVENCIA ESCOLAR" [customActions]="true">
+<button header-action *ngIf="canEdit" class="btn-primary" (click)="open()">+ Nuevo estudiante</button>
+<div class="page">
+ <p *ngIf="loading" role="status">Cargando estudiantes…</p>
+ <p *ngIf="error" class="error" role="alert">{{error}} <button class="btn-secondary" (click)="load(offset)">Reintentar</button></p>
+ <p *ngIf="success" class="success" role="status">{{success}}</p>
+ <p *ngIf="!canEdit" class="muted">Puedes consultar los estudiantes de tus casos. La administración del directorio corresponde a convivencia escolar.</p>
+
+ <form class="filters" (ngSubmit)="find()">
+  <label class="search"><img src="assets/figma/search.svg" alt=""><span class="sr-only">Buscar estudiantes</span><input name="q" [(ngModel)]="search" maxlength="100" placeholder="Buscar por nombres o apellidos"></label>
+  <select name="gradeFilter" aria-label="Filtrar por grado" [(ngModel)]="gradeFilter"><option value="">Todos los grados</option><option *ngFor="let g of grades" [value]="g">{{g}}.°</option></select>
+  <input class="section-filter" name="sectionFilter" aria-label="Filtrar por sección" [(ngModel)]="sectionFilter" maxlength="10" placeholder="Sección">
+  <button class="btn-secondary" [disabled]="loading">Buscar</button>
+ </form>
+
+ <section class="card-panel students" *ngIf="data&&!error">
+  <div class="table-scroll">
+   <table class="table">
+    <thead><tr><th>Estudiante</th><th>Grado</th><th>Sección</th><th>Estado</th><th *ngIf="canEdit">Acciones</th></tr></thead>
+    <tbody>
+     <tr *ngFor="let s of data.items">
+      <td><div class="student"><span class="avatar">{{initials(s)}}</span><b>{{s.nombres}} {{s.apellidos}}</b></div></td>
+      <td>{{s.grado}}.°</td>
+      <td>{{s.seccion}}</td>
+      <td><span class="status" [class.inactive]="!s.activo">● {{s.activo?'Activo':'Inactivo'}}</span></td>
+      <td *ngIf="canEdit" class="row-actions"><button class="text-button" (click)="open(s)">Editar</button><button class="text-button" [class.danger]="s.activo" [disabled]="busy" (click)="toggle(s)">{{s.activo?'Desactivar':'Activar'}}</button></td>
+     </tr>
+     <tr *ngIf="!data.items.length"><td [attr.colspan]="canEdit?5:4" class="empty">No hay estudiantes que coincidan con los filtros.</td></tr>
+    </tbody>
+   </table>
+  </div>
+  <div class="pagination">
+   <span>{{data.total?offset+1:0}}–{{end}} de {{data.total}}</span>
+   <button class="btn-secondary" (click)="load(offset-limit)" [disabled]="loading||offset===0">Anterior</button>
+   <button class="btn-secondary" (click)="load(offset+limit)" [disabled]="loading||end>=data.total">Siguiente</button>
+  </div>
+ </section>
+</div>
+</app-shell>
+
+<div *ngIf="dialog" class="dialog-backdrop">
+ <section role="dialog" aria-modal="true" aria-labelledby="student-dialog-title" class="card-panel dialog" (keydown.escape)="close()">
+  <h2 id="student-dialog-title">{{editing?'Editar estudiante':'Nuevo estudiante'}}</h2>
+  <p *ngIf="formError" class="error" role="alert">{{formError}}
+   <ng-container *ngIf="conflict"><br>Tu borrador se conserva. <button type="button" class="btn-secondary" [disabled]="busy" (click)="reloadCurrent()">Recargar datos actuales</button></ng-container>
+  </p>
+  <form (ngSubmit)="save()" #form="ngForm">
+   <fieldset [disabled]="busy">
+    <div class="form-grid">
+     <label>Nombres<input autofocus name="names" [(ngModel)]="names" required maxlength="100"></label>
+     <label>Apellidos<input name="surnames" [(ngModel)]="surnames" required maxlength="100"></label>
+     <label>Grado<select name="grade" [(ngModel)]="grade" required><option *ngFor="let g of grades" [ngValue]="g">{{g}}.°</option></select></label>
+     <label>Sección<input name="section" [(ngModel)]="section" required maxlength="10" placeholder="Ej. A"></label>
+    </div>
+    <p *ngIf="!editing" class="muted">Busca antes de crear para reutilizar estudiantes existentes: nombres iguales no implican duplicado.</p>
+    <div class="actions">
+     <button type="button" class="btn-secondary" (click)="close()">Cancelar</button>
+     <button type="submit" class="btn-primary" [disabled]="busy||form.invalid">{{busy?'Guardando…':'Guardar estudiante'}}</button>
+    </div>
+   </fieldset>
+  </form>
+ </section>
+</div>
