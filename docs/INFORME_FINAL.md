@@ -42,6 +42,7 @@ y el alcance comprobado. Ver [evidencia de pruebas](EVIDENCIA_ENTREGA.md).
 
 - [Manual de usuario](MANUAL_USUARIO.md) e [inicio rápido](INICIO_RAPIDO.md).
 - [Guion de exposición y comprobación previa](GUION_DEMO.md).
+- [Presentación de la semana 17](Exposicion-S17.pptx).
 - [Campos y criterios de aceptación](ALCANCE_Y_CRITERIOS.md).
 - Cronograma de la semana 17 y repositorio GitHub con los fuentes.
 

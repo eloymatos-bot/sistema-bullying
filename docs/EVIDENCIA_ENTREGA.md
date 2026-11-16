@@ -14,6 +14,8 @@ no forma parte de la carga inicial de otras instalaciones.
 | Reportes | El año de prueba mostró 53 casos; el filtro 3.º C mostró 5. Una sección sin coincidencias mostró el estado vacío. |
 | Navegación | Abrieron las pantallas de Alertas y Usuarios con el perfil administrador. |
 | Compilación y datos | Maven y Angular compilaron. La migración 07 se aplicó sobre la base existente sin eliminar sus 52 casos previos. |
+| Regresión de estudiantes | La suite HTTP/SQL pasó: roles, CSRF, filtros, vínculos, validaciones y conflictos. |
+| Regresión del resto de pantallas | Pasaron controles de usuarios, alertas y seguimiento, reporte a PDF, permisos de docente y pantallas a 390 px. La primera pasada detectó desbordamiento en reportes y el ajuste de filtros lo corrigió. |
 
 Las capturas de la sesión se entregan por separado. La exposición al profesor y
 las observaciones externas no se dan por realizadas con estas comprobaciones.

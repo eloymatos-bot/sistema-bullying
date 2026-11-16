@@ -4,6 +4,9 @@
 confirmar que puedan verse casos ficticios. Preparar un caso de prueba en seguimiento para
 mostrar el cierre. No mostrar contraseñas ni información de estudiantes reales.
 
+En la base local de Eloy, **CB-40** es un caso ficticio en seguimiento que estaba
+disponible para la demo. **CB-70** es el caso ficticio ya cerrado que se usó en la prueba.
+
 | Tiempo | Quién | Qué mostrar |
 |---|---|---|
 | 0:00–0:45 | Viviana | Problema: saber quién atiende un caso y qué está pendiente. Objetivo: centralizar el registro y la atención. |
