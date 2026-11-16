@@ -2,9 +2,10 @@
 
 ## Una sola vez
 
-1. Instala Java 17 o superior, Maven, Node.js 22 LTS, SQL Server Developer o Express,
-   SSMS y sqlcmd. Java, Maven, Node/npm y sqlcmd deben estar en PATH (sqlcmd ODBC
-   17/18 tambien se detecta en su carpeta habitual). Abre una terminal nueva.
+1. Instala Java 17 o superior, Maven, Node.js 22 LTS y el motor SQL Server Developer
+   o Express. Instala SSMS para comprobar y administrar la instancia. Java, Maven y
+   Node/npm deben estar en PATH. Abre Windows PowerShell. El asistente usa la
+   conexion SQL integrada de PowerShell y no requiere instalar `sqlcmd.exe`.
 2. En SSMS comprueba que puedes entrar a tu instancia local con autenticacion de
    Windows y administrar la base. Copia el nombre de esa instancia.
 3. En las propiedades del servidor de SSMS > Seguridad habilita autenticacion de
@@ -17,10 +18,12 @@
    ```powershell
    git clone --branch develop https://github.com/eloymatos-bot/sistema-bullying.git
    cd sistema-bullying
-   .\Preparar-proyecto.ps1
+   Set-ExecutionPolicy -Scope Process RemoteSigned
+   .\Preparar-proyecto.ps1 -DatosDemo
    ```
 
-El asistente pide instancia y puerto. Crea la base y las tablas solo si faltan,
+El asistente pide el nombre de servidor que usas en SSMS y el puerto TCP local.
+Crea la base y las tablas solo si faltan,
 genera una cuenta SQL exclusiva con permisos limitados, instala las dependencias
 y compila. Finalmente pide tus nombres, correo y una clave de al menos 12 caracteres
 para crear TU administrador del dashboard. La clave SQL se genera automaticamente;
@@ -34,12 +37,37 @@ Si la politica local lo requiere, ejecuta en esa terminal
 `Set-ExecutionPolicy -Scope Process RemoteSigned`; una politica de la institucion
 debe gestionarse con su administrador.
 
-Para incluir los 50 casos ficticios de demostracion, usa
-`.\Preparar-proyecto.ps1 -DatosDemo`. El script de datos no duplica su carga.
+La opcion `-DatosDemo` carga los 50 casos ficticios de demostracion. Es opcional
+y repetirla no duplica la carga. En SSMS puedes actualizar el nodo Bases de datos
+y abrir `SistemaBullying → Tablas` para comprobar el resultado.
 Repetir la preparacion conserva la configuracion privada y las cuentas existentes;
 no restablece claves. No reutilices el archivo privado de otra computadora.
 
-## Cada vez que trabajes
+## Arranque clasico en dos terminales
+
+Abre las dos terminales en la raiz del repositorio. Usa este recorrido para mostrar
+en vivo como se inicia cada parte.
+
+1. En la primera terminal, ejecuta:
+
+   ```powershell
+   Set-ExecutionPolicy -Scope Process RemoteSigned
+   .\Iniciar-local.ps1
+   ```
+
+   Deja esta terminal abierta. Espera a que Spring Boot arranque en el puerto 8080.
+2. En la segunda terminal, ejecuta:
+
+   ```powershell
+   cd .\Sistema_Bullying_Figma_Sin_Errores
+   npm.cmd start
+   ```
+
+   En PowerShell, `npm.cmd start` ejecuta el mismo script que `npm start` y
+   evita que Windows elija la variante `npm.ps1`. Abre http://127.0.0.1:4200
+   cuando Angular indique que esta listo. Para detener, presiona Ctrl+C en cada terminal.
+
+## Arranque alternativo con un comando
 
 ```powershell
 .\Iniciar-proyecto.ps1

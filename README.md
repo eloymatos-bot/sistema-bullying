@@ -24,11 +24,15 @@ Entrega S17: [informe](docs/INFORME_FINAL.md), [manual](docs/MANUAL_USUARIO.md),
 En instalaciones ya preparadas, vuelve a ejecutar `./Preparar-proyecto.ps1` para
 aplicar `07_acuerdos.sql` y recompilar conservando los datos y la cuenta local.
 
-Para Windows, usa el [inicio guiado](docs/INICIO_RAPIDO.md): despues de instalar
-los requisitos y preparar SQL Server local, ejecuta `./Preparar-proyecto.ps1`
-una sola vez y `./Iniciar-proyecto.ps1` cada vez que trabajes. El asistente crea
-tu propia cuenta del dashboard y conserva las cuentas existentes al repetirse.
-Puedes agregar `-DatosDemo` a la preparacion para cargar los 50 casos ficticios.
+En Windows, comprueba la instancia de SQL Server en SSMS y ejecuta
+`./Preparar-proyecto.ps1 -DatosDemo` una sola vez desde la raíz. Crea la base
+con 50 casos ficticios y te permite elegir tu cuenta del dashboard. La opción
+`-DatosDemo` se puede omitir y no hace falta instalar `sqlcmd.exe`.
+
+Para arrancar, ejecuta `./Iniciar-local.ps1` en una terminal y `npm start` desde
+la carpeta de Angular en otra. En PowerShell también puedes usar `npm.cmd start`.
+`./Iniciar-proyecto.ps1` inicia ambos servicios juntos. Consulta los pasos completos
+en la [guía de inicio rápido](docs/INICIO_RAPIDO.md).
 
 Requisitos: Node.js compatible con Angular 19, npm, Java 17 o superior, Maven y
 SQL Server. La base de datos se ejecuta en SQL Server, fuera de Angular.
