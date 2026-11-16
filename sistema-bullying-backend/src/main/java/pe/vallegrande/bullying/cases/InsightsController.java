@@ -1,4 +1,5 @@
 package pe.vallegrande.bullying.cases;
+import io.swagger.v3.oas.annotations.Operation;
 import java.security.Principal;
 import java.time.*;
 import java.util.*;
@@ -19,6 +20,9 @@ public class InsightsController {
  private Account actor(Principal p){return accounts.byEmail(p.getName()).filter(Account::activo).orElseThrow(()->new ResponseStatusException(HttpStatus.UNAUTHORIZED));}
  public record Alert(long id,String codigo,String estudiantes,long responsableId,String responsable,String clase,LocalDate fecha,LocalDate ultimaAccion){}
  public record Alerts(Page<Alert> resultados,long vencidas,long proximas,long atendidas,long sinFecha){}
+ @Operation(summary = "Consultar alertas de seguimiento",
+     description = "Lista los casos con seguimiento vencido, próximo, atendido o sin fecha según los filtros.",
+     tags = "Alertas")
  @GetMapping("/api/alerts")
  public Alerts alerts(Principal p,@RequestParam(defaultValue="") String q,@RequestParam(defaultValue="") String clase,@RequestParam(required=false) Long responsableId,@RequestParam(defaultValue="0") int offset,@RequestParam(defaultValue="20") int limit){
   CaseService.page(offset,limit);q=CaseService.search(q);var a=actor(p);var today=FollowUpService.today();
@@ -42,6 +46,9 @@ public class InsightsController {
  public record Group(String codigo,String nombre,long total){}
  public record Month(int mes,long registrados,long cerrados,Double promedioDias){}
  public record Report(int year,long total,long cerrados,Double promedioDias,long vencidos,long totalAnterior,List<Group> tipos,List<Group> estados,List<Month> meses){}
+ @Operation(summary = "Consultar el reporte anual de casos",
+     description = "Muestra los totales del año elegido por mes, tipo y estado. Puedes filtrar por grado y sección.",
+     tags = "Reportes")
  @GetMapping("/api/reports")
  public Report report(Principal p,@RequestParam int year,@RequestParam(required=false) Integer grado,
                       @RequestParam(defaultValue="") String seccion){

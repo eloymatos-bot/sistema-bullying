@@ -35,6 +35,10 @@ class OpenApiConfig {
     OpenApiCustomizer sessionApiDocumentation() {
         return api -> {
             api.info(new Info().title("API de Convivencia Escolar").version("1.0").description("""
+                GET consulta datos. POST registra datos o ejecuta acciones, como iniciar sesión.
+                PUT edita los datos de un registro. PATCH cambia una parte, como su estado.
+                Cuando una ruta indique {id}, usa el identificador numérico del registro.
+
                 Para iniciar sesión, ejecuta GET /api/auth/csrf, copia el valor de token
                 y pégalo en Authorize → CSRF. Ejecuta POST /api/auth/login con tu correo y contraseña.
                 El navegador conserva la cookie de sesión. Para escribir o cerrar sesión,
@@ -52,14 +56,17 @@ class OpenApiConfig {
             api.path(LOGIN, new PathItem().post(login()));
             api.path(LOGOUT, new PathItem().post(new Operation().operationId("cerrarSesion")
                 .tags(List.of("Autenticación")).summary("Cerrar la sesión actual")
+                .description("Cierra la sesión del navegador. Usa el token CSRF obtenido después de iniciar sesión.")
                 .responses(new ApiResponses().addApiResponse("204", response("Sesión cerrada")))));
             api.getPaths().forEach((path, item) -> item.readOperationsMap().forEach((method, operation) -> {
                 if (TOKEN.equals(path)) {
-                    operation.tags(List.of("Autenticación")).summary("Obtener token CSRF");
+                    operation.tags(List.of("Autenticación")).summary("Obtener token CSRF")
+                        .description("Devuelve el token que se envía en el encabezado X-CSRF-TOKEN. Pídelo de nuevo después de iniciar sesión.");
                     return;
                 }
                 if ("/api/auth/me".equals(path)) {
-                    operation.tags(List.of("Autenticación")).summary("Consultar la sesión actual");
+                    operation.tags(List.of("Autenticación")).summary("Consultar la sesión actual")
+                        .description("Muestra los datos y el rol de la cuenta con la que iniciaste sesión.");
                 }
                 var required = new SecurityRequirement();
                 if (!LOGIN.equals(path)) {
@@ -79,6 +86,7 @@ class OpenApiConfig {
         form.addProperty("password", new StringSchema().format("password"));
         form.setRequired(List.of("email", "password"));
         return new Operation().operationId("iniciarSesion").summary("Iniciar sesión")
+            .description("Usa el correo y la contraseña del dashboard. El navegador guarda la cookie de sesión.")
             .tags(List.of("Autenticación"))
             .requestBody(new RequestBody().required(true).content(new Content()
                 .addMediaType("application/x-www-form-urlencoded", new MediaType().schema(form))))

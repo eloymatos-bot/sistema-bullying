@@ -1,4 +1,6 @@
 package pe.vallegrande.bullying.users;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -6,11 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import pe.vallegrande.bullying.cases.CaseModels.Page;
 import pe.vallegrande.bullying.cases.CaseService;
+@Tag(name = "Usuarios")
 @RestController
 public class UserDirectoryController {
  private final JdbcTemplate jdbc;
  public UserDirectoryController(JdbcTemplate jdbc){this.jdbc=jdbc;}
  public record Directory(Page<Account.UserView> resultados,long activos,long convivencia,long docentes){}
+ @Operation(summary = "Buscar usuarios con filtros",
+     description = "Busca por nombre o correo y filtra por rol o estado. Incluye los totales del directorio.")
  @GetMapping("/api/users/directory")
  public Directory directory(@RequestParam(defaultValue="") String q,@RequestParam(defaultValue="") String rol,@RequestParam(required=false) Boolean activo,@RequestParam(defaultValue="0") int offset,@RequestParam(defaultValue="20") int limit){
   CaseService.page(offset,limit);q=CaseService.search(q);

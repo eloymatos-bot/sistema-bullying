@@ -1,5 +1,7 @@
 package pe.vallegrande.bullying.cases;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -15,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 import pe.vallegrande.bullying.users.Account;
 import pe.vallegrande.bullying.users.AccountRepository;
 
+@Tag(name = "Acuerdos")
 @RestController
 @RequestMapping("/api/cases/{id}/agreements")
 public class AgreementController {
@@ -62,11 +65,15 @@ public class AgreementController {
                     rs.getString("completado_por"),HexFormat.of().formatHex(rs.getBytes("version")));
             },agreementId==null?new Object[]{id}:new Object[]{id,agreementId});
     }
+    @Operation(summary = "Listar acuerdos de un caso",
+        description = "Muestra la descripción, el responsable, la fecha límite y si cada acuerdo se cumplió.")
     @GetMapping
     @Transactional(readOnly=true)
     public Directory list(@PathVariable long id,Principal p) {
         var a=actor(p);return new Directory(access(id,a,false).editable(a),read(id,null));
     }
+    @Operation(summary = "Registrar un acuerdo de atención",
+        description = "Indica el caso, la descripción, un responsable activo y una fecha límite igual o posterior a hoy.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
@@ -83,6 +90,8 @@ public class AgreementController {
             """,Long.class,id,description,input.responsableId(),input.fechaLimite(),a.id());
         return read(id,key).get(0);
     }
+    @Operation(summary = "Marcar un acuerdo como cumplido",
+        description = "Indica el ID del caso y del acuerdo. Envía la versión vigente del acuerdo para registrar su cumplimiento.")
     @PatchMapping("/{agreementId}/complete")
     @Transactional
     public Agreement complete(@PathVariable long id,@PathVariable long agreementId,@RequestBody Complete input,Principal p) {
