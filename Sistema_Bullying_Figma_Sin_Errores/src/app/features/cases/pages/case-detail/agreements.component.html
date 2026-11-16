@@ -15,11 +15,11 @@
        <div *ngIf="editable&&data.puedeEditar&&!row.cumplidoEn"><button type="button" class="btn-secondary" [disabled]="busy" (click)="complete(row)">Marcar cumplido</button></div>
      </li>
    </ul>
-   <form *ngIf="editable&&data.puedeEditar" (ngSubmit)="save()" #form="ngForm">
-     <label>Descripción del acuerdo<textarea name="description" [(ngModel)]="description" required maxlength="2000" rows="3"></textarea></label>
-     <label>Responsable del acuerdo<select name="responsible" [(ngModel)]="responsibleId" required><option [ngValue]="null">Seleccionar…</option><option *ngFor="let person of people" [ngValue]="person.id">{{person.nombres}} {{person.apellidos}}</option></select></label>
-     <label>Fecha límite del acuerdo<input name="due" type="date" [(ngModel)]="date" [min]="today" required></label>
-     <button class="btn-primary" [disabled]="busy||form.invalid" type="submit">Registrar acuerdo</button>
+   <form *ngIf="editable&&data.puedeEditar" (ngSubmit)="save()">
+     <label>Descripción del acuerdo<textarea name="description" [(ngModel)]="description" required maxlength="2000" rows="3" [attr.aria-invalid]="attempted && fields.description ? true : null" [attr.aria-describedby]="attempted && fields.description ? 'agreement-description-error' : null"></textarea><small class="field-error" id="agreement-description-error" *ngIf="attempted && fields.description as fieldError" role="alert">{{fieldError}}</small></label>
+     <label>Responsable del acuerdo<select name="responsible" [(ngModel)]="responsibleId" required [attr.aria-invalid]="attempted && fields.responsible ? true : null" [attr.aria-describedby]="attempted && fields.responsible ? 'agreement-responsible-error' : null"><option [ngValue]="null">Seleccionar…</option><option *ngFor="let person of people" [ngValue]="person.id">{{person.nombres}} {{person.apellidos}}</option></select><small class="field-error" id="agreement-responsible-error" *ngIf="attempted && fields.responsible as fieldError" role="alert">{{fieldError}}</small></label>
+     <label>Fecha límite del acuerdo<input name="due" type="date" [(ngModel)]="date" [min]="today" required [attr.aria-invalid]="attempted && fields.due ? true : null" [attr.aria-describedby]="attempted && fields.due ? 'agreement-due-error' : null"><small class="field-error" id="agreement-due-error" *ngIf="attempted && fields.due as fieldError" role="alert">{{fieldError}}</small></label>
+     <button class="btn-primary" [disabled]="busy" type="submit">Registrar acuerdo</button>
    </form>
  </ng-container>
  <button *ngIf="error" type="button" class="btn-secondary" [disabled]="busy||loading" (click)="load()">Recargar acuerdos</button>

@@ -7,14 +7,14 @@
  </section>
  <section class="login-side"><div class="login-box">
   <div class="eyebrow">ACCESO AL SISTEMA</div><h2>Inicia sesión</h2><p>Ingresa con las credenciales asignadas por tu institución educativa.</p>
-  <form (ngSubmit)="login()" #form="ngForm">
+  <form (ngSubmit)="login()">
    <div class="role-note">Tu cuenta determina si ingresas como administrador, convivencia escolar o docente.</div>
-   <label for="email">Correo institucional</label><input id="email" name="email" [(ngModel)]="email" type="email" required email maxlength="254" autocomplete="username" placeholder="nombre.apellido@institucion.edu.pe">
-   <label for="password">Contraseña</label><input id="password" name="password" [(ngModel)]="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+   <label for="email">Correo institucional</label><input id="email" name="email" [(ngModel)]="email" type="email" required email maxlength="254" autocomplete="username" placeholder="nombre.apellido@institucion.edu.pe" [attr.aria-invalid]="attempted && fields.email ? true : null" [attr.aria-describedby]="attempted && fields.email ? 'login-email-error' : null"><small class="field-error" id="login-email-error" *ngIf="attempted && fields.email as fieldError" role="alert">{{fieldError}}</small>
+   <label for="password">Contraseña</label><input id="password" name="password" [(ngModel)]="password" type="password" required autocomplete="current-password" placeholder="••••••••" [attr.aria-invalid]="attempted && fields.password ? true : null" [attr.aria-describedby]="attempted && fields.password ? 'login-password-error' : null"><small class="field-error" id="login-password-error" *ngIf="attempted && fields.password as fieldError" role="alert">{{fieldError}}</small>
    <div class="login-options"><label class="remember"><input name="remember" type="checkbox" [(ngModel)]="remember"> Recordar mi correo</label><button type="button" class="text-button" (click)="help=!help">¿Olvidaste tu contraseña?</button></div>
    <p *ngIf="help" role="status">Comunícate con el administrador de tu institución para recuperar el acceso.</p>
    <p *ngIf="error" class="error" role="alert">{{error}}</p>
-   <button class="login-btn" type="submit" [disabled]="busy||form.invalid">{{busy?'Ingresando…':'Ingresar'}}</button>
+   <button class="login-btn" type="submit" [disabled]="busy">{{busy?'Ingresando…':'Ingresar'}}</button>
   </form><div class="restricted">acceso restringido</div><p class="note">Solo personal autorizado por la institución educativa puede acceder. Si no tienes una cuenta, comunícate con el administrador del sistema.</p>
  </div></section>
 </div>

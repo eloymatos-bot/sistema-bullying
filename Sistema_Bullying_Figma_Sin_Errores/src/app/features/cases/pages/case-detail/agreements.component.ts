@@ -2,6 +2,7 @@ import { Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Api, Responsible, limaToday, message } from '../../../../core/api';
+import { hasFieldErrors, isCalendarDate, requiredText } from '../../../../core/form-validation';
 
 interface Agreement {
  id:number; descripcion:string; responsable:string; fechaLimite:string; creadoPor:string;
@@ -20,8 +21,17 @@ export class AgreementsComponent implements OnInit,OnChanges {
  @Input() editable=false;
  private api=inject(Api); private request=0;
  data:Directory|null=null; people:Responsible[]=[];
- description=''; responsibleId:number|null=null; date=limaToday(); readonly today=limaToday();
+ description=''; responsibleId:number|null=null; date=limaToday();
+ get today(){return limaToday();}
  busy=false; loading=false; error=''; success='';
+ attempted=false;
+ get fields(){
+   return {
+     description: requiredText(this.description,'la descripción del acuerdo',2000),
+     responsible: this.people.some(person=>person.id===this.responsibleId) ? '' : 'Selecciona un responsable activo.',
+     due: !isCalendarDate(this.date)||this.date<this.today ? 'La fecha límite debe ser hoy o posterior.' : ''
+   };
+ }
  ngOnInit(){void this.load();}
  ngOnChanges(changes:SimpleChanges){
    if(changes['caseId']&&!changes['caseId'].firstChange)void this.load();
@@ -37,12 +47,14 @@ export class AgreementsComponent implements OnInit,OnChanges {
    finally{if(request===this.request)this.loading=false;}
  }
  async save(){
-   if(this.busy||!this.editable||!this.data?.puedeEditar||!this.responsibleId||!this.description.trim()||!this.date)return;
-   this.busy=true;this.error='';this.success='';
+   if(this.busy||!this.editable||!this.data?.puedeEditar)return;
+   this.attempted=true;this.error='';this.success='';
+   if(hasFieldErrors(this.fields))return;
+   this.busy=true;
    try{
      const result=await this.api.write<Agreement>('/cases/'+this.caseId+'/agreements',
-       {descripcion:this.description,responsableId:this.responsibleId,fechaLimite:this.date});
-     this.data.items=[result,...this.data.items];this.description='';this.success='Acuerdo registrado.';
+       {descripcion:this.description.trim(),responsableId:this.responsibleId,fechaLimite:this.date});
+     this.data.items=[result,...this.data.items];this.description='';this.attempted=false;this.success='Acuerdo registrado.';
    }catch(e){this.error=message(e);}finally{this.busy=false;}
  }
  async complete(row:Agreement){

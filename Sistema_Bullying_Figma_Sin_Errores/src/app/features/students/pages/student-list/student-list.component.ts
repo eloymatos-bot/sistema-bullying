@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppShellComponent } from '../../../../shared/components/app-shell/app-shell.component';
 import { Api, Page, StudentRecord, message } from '../../../../core/api';
+import { hasFieldErrors, studentFields } from '../../../../core/form-validation';
 
 @Component({selector:'app-student-list',standalone:true,imports:[CommonModule,FormsModule,AppShellComponent],templateUrl:'./student-list.component.html',styleUrl:'./student-list.component.css'})
 export class StudentListComponent {
@@ -12,6 +13,14 @@ export class StudentListComponent {
  dialog=false;editing:StudentRecord|null=null;version='';busy=false;formError='';conflict=false;
  names='';surnames='';grade=1;section='';
  grades=[1,2,3,4,5];
+ attempted = false;
+ get fields() {
+  const fields = studentFields(this.names, this.surnames, this.grade, this.section);
+  if (this.editing?.nombres === this.names.trim()) fields.names = '';
+  if (this.editing?.apellidos === this.surnames.trim()) fields.surnames = '';
+  if (this.editing?.seccion === this.section.trim()) fields.section = '';
+  return fields;
+ }
  private request=0;
  constructor(){void this.load();}
 
@@ -32,16 +41,17 @@ export class StudentListComponent {
 
  open(student:StudentRecord|null=null){
   if(!this.canEdit)return;
+  this.attempted=false;
   this.editing=student;this.version=student?.version||'';this.names=student?.nombres||'';this.surnames=student?.apellidos||'';
   this.grade=student?.grado||1;this.section=student?.seccion||'';this.formError='';this.conflict=false;this.dialog=true;
  }
  close(){if(!this.busy){this.dialog=false;this.conflict=false;}}
 
  async save(){
-  if(this.busy)return;this.formError='';this.success='';
-  const body={nombres:this.names.trim(),apellidos:this.surnames.trim(),grado:Number(this.grade),seccion:this.section.trim()};
-  if(!body.nombres||!body.apellidos||!body.seccion){this.formError='Completa nombres, apellidos, grado y sección.';return;}
-  if(body.nombres.length>100||body.apellidos.length>100||body.seccion.length>10||body.grado<1||body.grado>5){this.formError='Revisa los datos del estudiante.';return;}
+  if(this.busy||!this.canEdit)return;
+  this.attempted=true;this.formError='';this.success='';
+  if(hasFieldErrors(this.fields))return;
+  const body={nombres:this.names.trim(),apellidos:this.surnames.trim(),grado:this.grade,seccion:this.section.trim()};
   this.busy=true;
   try{
    const wasEditing=!!this.editing;
@@ -64,7 +74,7 @@ export class StudentListComponent {
   try{
    const current=await this.api.get<StudentRecord>('/students/'+this.editing.id);
    this.editing=current;this.version=current.version;this.names=current.nombres;this.surnames=current.apellidos;
-   this.grade=current.grado;this.section=current.seccion;this.conflict=false;
+   this.grade=current.grado;this.section=current.seccion;this.conflict=false;this.attempted=false;
    await this.load(this.offset);
   }catch(e){this.formError=message(e);}
   finally{this.busy=false;}

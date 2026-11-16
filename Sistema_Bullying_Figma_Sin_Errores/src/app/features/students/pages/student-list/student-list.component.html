@@ -44,18 +44,18 @@
   <p *ngIf="formError" class="error" role="alert">{{formError}}
    <ng-container *ngIf="conflict"><br>Tu borrador se conserva. <button type="button" class="btn-secondary" [disabled]="busy" (click)="reloadCurrent()">Recargar datos actuales</button></ng-container>
   </p>
-  <form (ngSubmit)="save()" #form="ngForm">
+  <form (ngSubmit)="save()">
    <fieldset [disabled]="busy">
     <div class="form-grid">
-     <label>Nombres<input autofocus name="names" [(ngModel)]="names" required maxlength="100"></label>
-     <label>Apellidos<input name="surnames" [(ngModel)]="surnames" required maxlength="100"></label>
-     <label>Grado<select name="grade" [(ngModel)]="grade" required><option *ngFor="let g of grades" [ngValue]="g">{{g}}.°</option></select></label>
-     <label>Sección<input name="section" [(ngModel)]="section" required maxlength="10" placeholder="Ej. A"></label>
+     <label>Nombres<input autofocus name="names" [(ngModel)]="names" required maxlength="100" [attr.aria-invalid]="attempted && fields.names ? true : null" [attr.aria-describedby]="attempted && fields.names ? 'student-names-error' : null"><small class="field-error" id="student-names-error" *ngIf="attempted && fields.names as fieldError" role="alert">{{fieldError}}</small></label>
+     <label>Apellidos<input name="surnames" [(ngModel)]="surnames" required maxlength="100" [attr.aria-invalid]="attempted && fields.surnames ? true : null" [attr.aria-describedby]="attempted && fields.surnames ? 'student-surnames-error' : null"><small class="field-error" id="student-surnames-error" *ngIf="attempted && fields.surnames as fieldError" role="alert">{{fieldError}}</small></label>
+     <label>Grado<select name="grade" [(ngModel)]="grade" required [attr.aria-invalid]="attempted && fields.grade ? true : null" [attr.aria-describedby]="attempted && fields.grade ? 'student-grade-error' : null"><option *ngFor="let g of grades" [ngValue]="g">{{g}}.°</option></select><small class="field-error" id="student-grade-error" *ngIf="attempted && fields.grade as fieldError" role="alert">{{fieldError}}</small></label>
+     <label>Sección<input name="section" [(ngModel)]="section" required maxlength="10" placeholder="Ej. A" [attr.aria-invalid]="attempted && fields.section ? true : null" [attr.aria-describedby]="attempted && fields.section ? 'student-section-error' : null"><small class="field-error" id="student-section-error" *ngIf="attempted && fields.section as fieldError" role="alert">{{fieldError}}</small></label>
     </div>
     <p *ngIf="!editing" class="muted">Busca antes de crear para reutilizar estudiantes existentes: nombres iguales no implican duplicado.</p>
     <div class="actions">
      <button type="button" class="btn-secondary" (click)="close()">Cancelar</button>
-     <button type="submit" class="btn-primary" [disabled]="busy||form.invalid">{{busy?'Guardando…':'Guardar estudiante'}}</button>
+     <button type="submit" class="btn-primary" [disabled]="busy">{{busy?'Guardando…':'Guardar estudiante'}}</button>
     </div>
    </fieldset>
   </form>

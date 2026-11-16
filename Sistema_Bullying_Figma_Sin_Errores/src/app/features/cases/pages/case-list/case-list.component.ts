@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AppShellComponent } from '../../../../shared/components/app-shell/app-shell.component';
 import { Api, Catalogs, Detail, Page, Summary, badge, message } from '../../../../core/api';
+import { isCalendarDate } from '../../../../core/form-validation';
 @Component({selector:'app-case-list',standalone:true,imports:[CommonModule,FormsModule,RouterLink,AppShellComponent],templateUrl:'./case-list.component.html',styleUrl:'./case-list.component.css'})
 export class FutListComponent {
  private api=inject(Api);private route=inject(ActivatedRoute);
@@ -12,6 +13,12 @@ export class FutListComponent {
  constructor(){void this.init();}
  async init(){try{this.catalogs=await this.api.get<Catalogs>('/cases/catalogs');await this.load();}catch(e){this.error=message(e);}}
  async load(offset=0){
+  if((this.desde&&!isCalendarDate(this.desde))||(this.hasta&&!isCalendarDate(this.hasta))){
+   this.error='Ingresa fechas válidas para la búsqueda.';return;
+  }
+  if(this.desde&&this.hasta&&this.desde>this.hasta){
+   this.error='La fecha «Hasta» debe ser igual o posterior a «Desde».';return;
+  }
   const request=++this.request;this.loading=true;this.error='';this.offset=offset;this.rows=[];
   try{
    const filters:Record<string,string|number>={q:this.search,estado:this.status,tipo:this.type,offset,limit:this.limit};
