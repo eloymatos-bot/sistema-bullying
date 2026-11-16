@@ -45,7 +45,7 @@ no restablece claves. No reutilices el archivo privado de otra computadora.
 .\Iniciar-proyecto.ps1
 ```
 
-Espera el mensaje de Angular y abre http://localhost:4200. Ingresa con el correo y
+Espera el mensaje de Angular y abre http://127.0.0.1:4200. Ingresa con el correo y
 la clave que elegiste. Al terminar presiona Ctrl+C en la terminal (confirma la
 finalizacion del proceso si Windows la solicita). El backend iniciado por el
 asistente se detiene al salir. La base queda en tu SQL Server local.

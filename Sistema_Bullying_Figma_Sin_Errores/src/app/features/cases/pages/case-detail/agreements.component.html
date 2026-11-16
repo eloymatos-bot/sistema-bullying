@@ -1,0 +1,26 @@
+<section class="card-panel" aria-label="Acuerdos de atención">
+ <h2>Acuerdos de atención</h2>
+ <p *ngIf="loading" role="status">Cargando acuerdos…</p>
+ <p *ngIf="error" class="error" role="alert">{{error}}</p>
+ <p *ngIf="success" class="result" role="status">{{success}}</p>
+ <ng-container *ngIf="data&&!loading">
+   <p *ngIf="!data.items.length" class="muted">Todavía no hay acuerdos.</p>
+   <ul class="agreement-list" *ngIf="data.items.length">
+     <li *ngFor="let row of data.items">
+       <b>{{row.descripcion}}</b>
+       <p>{{row.responsable}} · Plazo: {{row.fechaLimite | date:'dd/MM/yyyy'}}</p>
+       <p *ngIf="row.cumplidoEn">Cumplido por {{row.cumplidoPor}} · {{row.cumplidoEn | date:'dd/MM/yyyy HH:mm':'-0500'}}</p>
+       <p *ngIf="!row.cumplidoEn">{{row.fechaLimite < today ? 'Vencido' : 'Pendiente'}}</p>
+       <small>Creado por {{row.creadoPor}}</small>
+       <div *ngIf="editable&&data.puedeEditar&&!row.cumplidoEn"><button type="button" class="btn-secondary" [disabled]="busy" (click)="complete(row)">Marcar cumplido</button></div>
+     </li>
+   </ul>
+   <form *ngIf="editable&&data.puedeEditar" (ngSubmit)="save()" #form="ngForm">
+     <label>Descripción del acuerdo<textarea name="description" [(ngModel)]="description" required maxlength="2000" rows="3"></textarea></label>
+     <label>Responsable del acuerdo<select name="responsible" [(ngModel)]="responsibleId" required><option [ngValue]="null">Seleccionar…</option><option *ngFor="let person of people" [ngValue]="person.id">{{person.nombres}} {{person.apellidos}}</option></select></label>
+     <label>Fecha límite del acuerdo<input name="due" type="date" [(ngModel)]="date" [min]="today" required></label>
+     <button class="btn-primary" [disabled]="busy||form.invalid" type="submit">Registrar acuerdo</button>
+   </form>
+ </ng-container>
+ <button *ngIf="error" type="button" class="btn-secondary" [disabled]="busy||loading" (click)="load()">Recargar acuerdos</button>
+</section>

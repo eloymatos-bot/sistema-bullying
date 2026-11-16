@@ -19,6 +19,11 @@ su pantalla de Angular corresponde a la actividad 25.
 
 ## Preparación en otro equipo
 
+Entrega S17: [informe](docs/INFORME_FINAL.md), [manual](docs/MANUAL_USUARIO.md),
+[guion de exposición](docs/GUION_DEMO.md) y [pruebas](docs/EVIDENCIA_ENTREGA.md).
+En instalaciones ya preparadas, vuelve a ejecutar `./Preparar-proyecto.ps1` para
+aplicar `07_acuerdos.sql` y recompilar conservando los datos y la cuenta local.
+
 Para Windows, usa el [inicio guiado](docs/INICIO_RAPIDO.md): despues de instalar
 los requisitos y preparar SQL Server local, ejecuta `./Preparar-proyecto.ps1`
 una sola vez y `./Iniciar-proyecto.ps1` cada vez que trabajes. El asistente crea

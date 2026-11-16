@@ -1,0 +1,11 @@
+.filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px}.search{display:flex;gap:12px;align-items:center;flex:1;min-width:230px;padding:0 16px;background:white;border:1px solid var(--line);border-radius:6px}.search input{padding:12px 0;width:100%;min-width:0;border:0;font-size:14px;background:white}
+.students{padding:0;overflow:hidden}.table-scroll{overflow-x:auto}.table{min-width:560px}
+.student{display:flex;align-items:center;gap:12px}.avatar{background:var(--green);color:white;border-radius:50%;min-width:34px;height:34px;display:grid;place-items:center;font:13px 'Fraunces',Georgia,serif}
+.text-button{background:none;border:0;padding:0;color:var(--navy-2);font-size:13px;font-weight:600}
+.pagination{display:flex;align-items:center;gap:10px;padding:18px 22px;font-size:13px;border-top:1px solid var(--line)}.pagination span{margin-right:auto}.empty{text-align:center;padding:30px!important}
+.dialog-backdrop{position:fixed;inset:0;background:#14343480;z-index:1000;display:grid;place-items:center;padding:20px;overflow:auto}.dialog{width:min(520px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:30px}.dialog h2{margin-top:0}.dialog fieldset{padding:0;margin:0;border:0;min-width:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.form-grid label{font-size:13px;font-weight:600}.form-grid input,.form-grid select{display:block;width:100%;padding:12px;border:1px solid var(--line);border-radius:6px;margin-top:6px;background:white;font-size:14px}
+.actions{display:flex;gap:12px;justify-content:flex-end;border-top:1px solid var(--line);padding-top:20px;margin-top:24px}
+@media(max-width:500px){.form-grid{grid-template-columns:1fr}.dialog{padding:20px}}
+.filters select{background:white;padding:12px;border:1px solid var(--line);border-radius:6px;font-size:14px}.section-filter{width:120px;background:white;padding:12px;border:1px solid var(--line);border-radius:6px;font-size:14px}.status{color:#4c7253;white-space:nowrap;font-size:13px}.status.inactive{color:#b63630}.muted{font-size:13px;color:var(--muted);line-height:1.5}.error .btn-secondary{margin-top:8px;padding:6px 12px}
+.row-actions{display:flex;gap:16px;white-space:nowrap}.text-button.danger{color:#b63630}.text-button:disabled{opacity:.5}

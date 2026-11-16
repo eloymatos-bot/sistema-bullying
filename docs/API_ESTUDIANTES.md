@@ -22,6 +22,7 @@ obtenido después del login. No enviar identidad ni rol del autor desde Angular.
 | GET /api/students/{id} | Datos y versión; 404 si no existe o queda fuera del alcance. |
 | POST /api/students | Alta por administrador/convivencia; 201 y cabecera Location. |
 | PUT /api/students/{id} | Edición por administrador/convivencia; 200 y versión nueva. |
+| PATCH /api/students/{id}/status | Activa o desactiva con `{"activo":false,"version":"VERSIÓN_ACTUAL"}`; conserva vínculos e historial. |
 | GET /api/students | Selector anterior, sin cambiar su contrato. |
 
 Alta:
@@ -37,7 +38,8 @@ sirve como valor real: debe copiarse de la respuesta del alumno seleccionado.
 
 Docente puede consultar únicamente alumnos activos de casos registrados/asignados,
 pero no administrar el directorio. Administración/convivencia consultan todos,
-incluidos inactivos; no hay endpoint para activarlos, desactivarlos ni borrarlos.
+incluidos inactivos. El cambio de actividad requiere el permiso SQL que agrega
+`07_acuerdos.sql`. No se borran estudiantes.
 
 Errores: 400 datos, búsqueda >100 o paginación inválida; 401 sesión; 403 rol/CSRF;
 404 inexistente/ajeno; 409 versión antigua. La pantalla 25 debe conservar el borrador

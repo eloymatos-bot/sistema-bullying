@@ -12,7 +12,7 @@ S17. Se reutilizan el login, los casos y los seguimientos existentes. Las tareas
 | nombres / apellidos | Obligatorios, hasta 100 caracteres cada uno, espacios exteriores retirados, sin controles. |
 | grado | Entero de 1 a 5, correspondiente a secundaria. |
 | seccion | Obligatoria, hasta 10 caracteres, espacios exteriores retirados; nuevas altas/ediciones guardan mayúsculas. |
-| activo | Campo existente consultable; esta entrega no agrega un cambio de actividad. |
+| activo | Administración y convivencia pueden activarlo o desactivarlo con control de versión para conservar el historial. |
 | version | ROWVERSION de SQL Server, representada por 16 caracteres hexadecimales. Obligatoria al editar. |
 
 Administración y convivencia registran y editan en el directorio. Docentes consultan

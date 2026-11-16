@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AppShellComponent } from '../../../../shared/components/app-shell/app-shell.component';
+import { AgreementsComponent } from './agreements.component';
 import { Api, Detail, Timeline, badge, message, stateName, limaToday } from '../../../../core/api';
-@Component({selector:'app-case-detail',standalone:true,imports:[CommonModule,FormsModule,AppShellComponent],templateUrl:'./case-detail.component.html',styleUrl:'./case-detail.component.css'})
+@Component({selector:'app-case-detail',standalone:true,imports:[CommonModule,FormsModule,AppShellComponent,AgreementsComponent],templateUrl:'./case-detail.component.html',styleUrl:'./case-detail.component.css'})
 export class FutDetailComponent {
  private api=inject(Api);private route=inject(ActivatedRoute);detail:Detail|null=null;timeline:Timeline|null=null;loading=true;error='';saveError='';success='';busy=false;conflict=false;action='';date=limaToday();nextDate='';state='';today=limaToday();cls=badge;stateName=stateName;
  created=typeof history!=='undefined'&&!!history.state?.created;

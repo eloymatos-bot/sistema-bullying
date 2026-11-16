@@ -18,10 +18,10 @@ try {
         Start-Sleep -Seconds 1
     }
     if (!$ready) { throw 'El backend no respondio a tiempo. Revisa SQL Server y los registros en .local/.' }
-    Write-Host 'Backend listo. Angular se inicia ahora. Cuando termine, abre http://localhost:4200'
+    Write-Host 'Backend listo. Angular se inicia ahora. Cuando termine, abre http://127.0.0.1:4200'
     Write-Host 'Usa la cuenta creada en esta computadora. Ctrl+C detiene la sesion de trabajo.'
     Push-Location $FrontendRoot
-    try { & $npm start; if ($LASTEXITCODE -ne 0) { throw 'Angular termino con un error.' } } finally { Pop-Location }
+    try { & $npm start -- --host 127.0.0.1; if ($LASTEXITCODE -ne 0) { throw 'Angular termino con un error.' } } finally { Pop-Location }
 } finally {
     if ($backendProcess -and !$backendProcess.HasExited) { Stop-Process -Id $backendProcess.Id -ErrorAction SilentlyContinue }
 }

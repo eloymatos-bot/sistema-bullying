@@ -54,6 +54,7 @@ if (!(Test-Path -LiteralPath $config)) {
     $secret = $null; $settings = $null
 } else { Write-Host 'Se conserva la conexion privada existente.' }
 Invoke-SqlFile '06_gestion_estudiantes.sql'
+Invoke-SqlFile '07_acuerdos.sql'
 Push-Location $BackendRoot
 try { & $maven package; if ($LASTEXITCODE -ne 0) { throw 'Fallo la compilacion del backend.' } } finally { Pop-Location }
 Push-Location $FrontendRoot

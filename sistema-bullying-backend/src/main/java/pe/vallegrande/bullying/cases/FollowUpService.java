@@ -45,6 +45,8 @@ public class FollowUpService {
         var next=Map.of("REPORTADO","EN_EVALUACION","EN_EVALUACION","EN_SEGUIMIENTO","EN_SEGUIMIENTO","CERRADO");
         if(state==null||(!state.equals(c.state())&&!state.equals(next.get(c.state()))))throw bad("Transición no válida. Sigue el orden: reportado, evaluación, seguimiento y cerrado.");
         if(state.equals("CERRADO")&&input.proximaFecha()!=null)throw bad("Un caso cerrado no tiene próxima fecha.");
+        if(state.equals("CERRADO")&&jdbc.queryForObject("SELECT COUNT(*) FROM dbo.acuerdos WHERE caso_id=? AND cumplido_en IS NULL",Integer.class,id)>0)
+            throw bad("Completa los acuerdos pendientes antes de cerrar el caso.");
         if(input.proximaFecha()!=null&&(input.proximaFecha().isBefore(today())||input.proximaFecha().isBefore(c.incident())||input.proximaFecha().getYear()>9999))throw bad("La próxima fecha debe ser hoy o posterior al incidente.");
         boolean changed=!state.equals(c.state());
         jdbc.update("INSERT dbo.seguimientos(caso_id,registrado_por,accion,fecha_accion,estado_anterior,estado_nuevo,proxima_fecha) VALUES (?,?,?,?,?,?,?)",id,a.id(),action,input.fechaAccion(),changed?c.state():null,changed?state:null,input.proximaFecha());

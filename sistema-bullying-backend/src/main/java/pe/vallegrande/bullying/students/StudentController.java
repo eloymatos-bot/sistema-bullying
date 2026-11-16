@@ -29,4 +29,8 @@ public class StudentController {
     public StudentView edit(@PathVariable long id,@RequestBody EditStudent input,Principal actor) {
         return service.edit(id,input,actor.getName());
     }
+    @PatchMapping("/api/students/{id}/status")
+    public StudentView status(@PathVariable long id,@RequestBody StudentStatus input,Principal actor) {
+        return service.setStatus(id,input,actor.getName());
+    }
 }

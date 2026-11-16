@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 export interface User { id:number; nombres:string; apellidos:string; correo:string; rol:string; activo:boolean }
 export interface Catalog { codigo:string; nombre:string }
 export interface Student { id:number; nombres:string; apellidos:string; grado:number; seccion:string }
+export interface StudentRecord extends Student { activo:boolean; version:string }
 export interface Summary { id:number; codigo:string; fechaIncidente:string; lugar:string; tipoCodigo:string; tipo:string; estadoCodigo:string; estado:string; responsableId:number; responsable:string; registradoPor:number; creadoEn:string }
 export interface Detail { caso:Summary; descripcion:string; observaciones:string|null; estudiantes:{estudiante:Student; participacion:string}[] }
 export interface Page<T> { items:T[]; total:number; offset:number; limit:number }

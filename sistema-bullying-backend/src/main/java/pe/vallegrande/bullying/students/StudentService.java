@@ -21,6 +21,7 @@ public class StudentService {
     public record StudentView(long id, String nombres, String apellidos, int grado,
                               String seccion, boolean activo, String version) {}
     public record EditStudent(String nombres, String apellidos, Integer grado, String seccion, String version) {}
+    public record StudentStatus(Boolean activo, String version) {}
     private final JdbcTemplate jdbc;
     private final AccountRepository accounts;
     private static final String FIELDS = "s.id,s.nombres,s.apellidos,s.grado,s.seccion,s.activo,s.version";
@@ -102,6 +103,17 @@ public class StudentService {
         int changed=jdbc.update("UPDATE dbo.estudiantes SET nombres=?,apellidos=?,grado=?,seccion=? WHERE id=? AND version=?",
             clean.nombres(),clean.apellidos(),clean.grado(),clean.seccion(),id,HexFormat.of().parseHex(input.version()));
         if(changed!=1) throw new ResponseStatusException(HttpStatus.CONFLICT,"Otra persona modificó el estudiante. Recarga sus datos antes de guardar.");
+        return find(id,user);
+    }
+    @Transactional
+    public StudentView setStatus(long id,StudentStatus input,String email) {
+        Account user=editor(email);
+        if(input==null||input.activo()==null||input.version()==null||!input.version().matches("[0-9a-fA-F]{16}"))
+            throw bad("Se requiere el estado activo y la versión del estudiante.");
+        find(id,user);
+        int changed=jdbc.update("UPDATE dbo.estudiantes SET activo=? WHERE id=? AND version=?",
+            input.activo(),id,HexFormat.of().parseHex(input.version()));
+        if(changed!=1) throw new ResponseStatusException(HttpStatus.CONFLICT,"El estudiante cambió. Recarga antes de guardar.");
         return find(id,user);
     }
 }

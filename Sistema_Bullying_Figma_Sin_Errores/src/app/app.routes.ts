@@ -7,6 +7,7 @@ import { FutDetailComponent } from './features/cases/pages/case-detail/case-deta
 import { sessionGuard, adminGuard } from './core/api';
 import { TrackingComponent } from './features/tracking/pages/tracking/tracking.component';
 import { ReportsComponent } from './features/reports/pages/reports/reports.component';
+import { StudentListComponent } from './features/students/pages/student-list/student-list.component';
 import { UserListComponent } from './features/users/pages/user-list/user-list.component';
 export const routes:Routes=[
  {path:'',redirectTo:'home',pathMatch:'full'},
@@ -16,6 +17,7 @@ export const routes:Routes=[
   {path:'cases',component:FutListComponent},
   {path:'cases/nuevo',component:FutCreateComponent},
   {path:'cases/:id',component:FutDetailComponent},
+  {path:'estudiantes',component:StudentListComponent},
   {path:'seguimiento',component:TrackingComponent},
   {path:'reportes',component:ReportsComponent},
   {path:'usuarios',component:UserListComponent,canActivate:[adminGuard]}

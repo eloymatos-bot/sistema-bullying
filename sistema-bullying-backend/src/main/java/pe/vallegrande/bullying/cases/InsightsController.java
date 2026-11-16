@@ -43,16 +43,30 @@ public class InsightsController {
  public record Month(int mes,long registrados,long cerrados,Double promedioDias){}
  public record Report(int year,long total,long cerrados,Double promedioDias,long vencidos,long totalAnterior,List<Group> tipos,List<Group> estados,List<Month> meses){}
  @GetMapping("/api/reports")
- public Report report(Principal p,@RequestParam int year){
+ public Report report(Principal p,@RequestParam int year,@RequestParam(required=false) Integer grado,
+                      @RequestParam(defaultValue="") String seccion){
   if(year<1900||year>9998)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Año fuera de rango.");
+  if(grado!=null&&(grado<1||grado>5))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"El grado debe ser de 1 a 5.");
+  seccion=seccion.strip().toUpperCase(Locale.ROOT);
+  if(seccion.length()>10||seccion.codePoints().anyMatch(Character::isISOControl))
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Sección no válida (máximo 10 caracteres).");
   var a=actor(p);String registered="DATEADD(hour,-5,c.creado_en)";List<Object> args=new ArrayList<>(List.of(LocalDate.of(year,1,1),LocalDate.of(year+1,1,1)));
-  String visible=CaseRepository.scope(a,args),where=" WHERE "+registered+">=? AND "+registered+"<?"+visible;
+  List<Object> filters=new ArrayList<>();
+  String visible=CaseRepository.scope(a,filters);
+  if(grado!=null||!seccion.isEmpty()){
+   visible+=" AND EXISTS (SELECT 1 FROM dbo.caso_estudiantes ce JOIN dbo.estudiantes s ON s.id=ce.estudiante_id WHERE ce.caso_id=c.id";
+   if(grado!=null){visible+=" AND s.grado=?";filters.add(grado);}
+   if(!seccion.isEmpty()){visible+=" AND UPPER(s.seccion)=?";filters.add(seccion);}
+   visible+=")";
+  }
+  args.addAll(filters);
+  String where=" WHERE "+registered+">=? AND "+registered+"<?"+visible;
   List<Object> totalArgs=new ArrayList<>(List.of(FollowUpService.today()));totalArgs.addAll(args);
   var totals=jdbc.queryForMap("SELECT COUNT_BIG(*) total,COALESCE(SUM(CASE WHEN estado_codigo='CERRADO' THEN 1 ELSE 0 END),0) cerrados,AVG(CASE WHEN estado_codigo='CERRADO' THEN DATEDIFF_BIG(second,creado_en,cerrado_en)/86400.0 END) promedio,COALESCE(SUM(CASE WHEN estado_codigo<>'CERRADO' AND proximo_seguimiento<? THEN 1 ELSE 0 END),0) vencidos FROM dbo.casos c"+where,totalArgs.toArray());
   var types=jdbc.query("SELECT t.codigo,t.nombre,COUNT_BIG(c.id) total FROM dbo.tipos_incidente t LEFT JOIN dbo.casos c ON c.tipo_codigo=t.codigo AND "+registered+">=? AND "+registered+"<?"+visible+" GROUP BY t.codigo,t.nombre ORDER BY total DESC,t.nombre",(r,n)->new Group(r.getString(1),r.getString(2),r.getLong(3)),args.toArray());
   var states=jdbc.query("SELECT t.codigo,t.nombre,COUNT_BIG(c.id) total FROM dbo.estados_caso t LEFT JOIN dbo.casos c ON c.estado_codigo=t.codigo AND "+registered+">=? AND "+registered+"<?"+visible+" GROUP BY t.codigo,t.nombre ORDER BY t.codigo",(r,n)->new Group(r.getString(1),r.getString(2),r.getLong(3)),args.toArray());
   var months=jdbc.query("SELECT MONTH("+registered+") mes,COUNT_BIG(*) total,SUM(CASE WHEN estado_codigo='CERRADO' THEN 1 ELSE 0 END) cerrados,AVG(CASE WHEN estado_codigo='CERRADO' THEN DATEDIFF_BIG(second,creado_en,cerrado_en)/86400.0 END) promedio FROM dbo.casos c"+where+" GROUP BY MONTH("+registered+") ORDER BY mes",(r,n)->new Month(r.getInt(1),r.getLong(2),r.getLong(3),r.getObject(4)==null?null:r.getDouble(4)),args.toArray());
-  var priorArgs=new ArrayList<Object>(List.of(LocalDate.of(year-1,1,1),LocalDate.of(year,1,1)));CaseRepository.scope(a,priorArgs);
+  var priorArgs=new ArrayList<Object>(List.of(LocalDate.of(year-1,1,1),LocalDate.of(year,1,1)));priorArgs.addAll(filters);
   long prior=jdbc.queryForObject("SELECT COUNT_BIG(*) FROM dbo.casos c"+where,Long.class,priorArgs.toArray());
   return new Report(year,((Number)totals.get("total")).longValue(),((Number)totals.get("cerrados")).longValue(),totals.get("promedio")==null?null:((Number)totals.get("promedio")).doubleValue(),((Number)totals.get("vencidos")).longValue(),prior,types,states,months);
  }
