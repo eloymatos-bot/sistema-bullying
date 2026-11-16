@@ -1,5 +1,6 @@
 package pe.vallegrande.bullying.security;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import pe.vallegrande.bullying.users.Account;
@@ -13,7 +14,7 @@ public class AuthController {
     private final AccountRepository repository;
     public AuthController(AccountRepository repository) { this.repository = repository; }
     @GetMapping("/csrf")
-    public Map<String,String> csrf(CsrfToken token) {
+    public Map<String,String> csrf(@Parameter(hidden = true) CsrfToken token) {
         return Map.of("headerName", token.getHeaderName(), "token", token.getToken());
     }
     @GetMapping("/me")

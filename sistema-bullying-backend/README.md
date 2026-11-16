@@ -64,6 +64,21 @@ La API escucha en `http://127.0.0.1:8080`. `GET /api/auth/csrf` permite comproba
 que responde. Las pantallas están en Angular. Detener con Ctrl+C.
 El script usa `JAVA_HOME` si está definido.
 
+## Probar endpoints con Swagger
+
+Con el perfil `local`, abre [Swagger UI](http://127.0.0.1:8080/swagger-ui/index.html).
+El contrato generado está en [OpenAPI JSON](http://127.0.0.1:8080/v3/api-docs).
+
+1. En **Autenticación**, ejecuta `GET /api/auth/csrf`. Copia el valor de `token`
+   e introdúcelo en **Authorize → CSRF**.
+2. Ejecuta `POST /api/auth/login` con tu correo y contraseña del dashboard. El
+   navegador guarda la cookie de sesión. Prueba `GET /api/auth/me`.
+3. Para ejecutar un `POST`, `PUT` o `PATCH`, vuelve a pedir el token con
+   `GET /api/auth/csrf` tras iniciar sesión y reemplázalo en **Authorize → CSRF**.
+
+Usa la misma pestaña y dirección para todas las solicitudes. Cada operación
+conserva los permisos del rol del usuario.
+
 ## API de la actividad 10
 
 | Método y ruta | Acceso | Función |

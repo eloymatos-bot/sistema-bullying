@@ -34,6 +34,10 @@ la carpeta de Angular en otra. En PowerShell también puedes usar `npm.cmd start
 `./Iniciar-proyecto.ps1` inicia ambos servicios juntos. Consulta los pasos completos
 en la [guía de inicio rápido](docs/INICIO_RAPIDO.md).
 
+Para probar los endpoints con el backend encendido, abre
+[Swagger UI](http://127.0.0.1:8080/swagger-ui/index.html) y sigue los pasos de
+[autenticación en Swagger](sistema-bullying-backend/README.md#probar-endpoints-con-swagger).
+
 Requisitos: Node.js compatible con Angular 19, npm, Java 17 o superior, Maven y
 SQL Server. La base de datos se ejecuta en SQL Server, fuera de Angular.
 

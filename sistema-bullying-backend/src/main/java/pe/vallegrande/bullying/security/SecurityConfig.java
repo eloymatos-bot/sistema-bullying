@@ -32,7 +32,9 @@ public class SecurityConfig {
     }
     @Bean
     SecurityFilterChain security(HttpSecurity http, AccountRepository repository,
-                                 @Value("${app.allowed-origin}") String origin) throws Exception {
+                                 @Value("${app.allowed-origin}") String origin,
+                                 @Value("${springdoc.api-docs.enabled:false}") boolean apiDocs,
+                                 @Value("${springdoc.swagger-ui.enabled:false}") boolean swaggerUi) throws Exception {
         CorsConfiguration cors = new CorsConfiguration();
         cors.setAllowedOrigins(List.of(origin));
         cors.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "OPTIONS"));
@@ -42,8 +44,14 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/api/**", cors);
         http.cors(c -> c.configurationSource(source));
         // CSRF permanece habilitado: el cliente obtiene el token en /api/auth/csrf.
-        http.authorizeHttpRequests(a -> a
-            .requestMatchers("/api/auth/csrf", "/api/auth/login").permitAll()
+        http.authorizeHttpRequests(a -> {
+            if (apiDocs) {
+                a.requestMatchers(HttpMethod.GET, "/v3/api-docs", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll();
+            }
+            if (swaggerUi) {
+                a.requestMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**").permitAll();
+            }
+            a.requestMatchers("/api/auth/csrf", "/api/auth/login").permitAll()
             .requestMatchers("/api/users", "/api/users/**").hasRole("ADMINISTRADOR")
             .requestMatchers(HttpMethod.POST,"/api/students").hasAnyRole("ADMINISTRADOR","CONVIVENCIA")
             .requestMatchers(HttpMethod.PUT,"/api/students/*").hasAnyRole("ADMINISTRADOR","CONVIVENCIA")
@@ -52,7 +60,8 @@ public class SecurityConfig {
             .requestMatchers("/api/cases", "/api/cases/**", "/api/students", "/api/alerts", "/api/reports")
                 .hasAnyRole("ADMINISTRADOR", "CONVIVENCIA", "DOCENTE_TUTOR")
             .requestMatchers("/api/auth/me").authenticated()
-            .anyRequest().denyAll());
+            .anyRequest().denyAll();
+        });
         http.requestCache(c -> c.disable());
         http.formLogin(f -> f.loginProcessingUrl("/api/auth/login").usernameParameter("email")
             .successHandler((req, res, auth) -> {
